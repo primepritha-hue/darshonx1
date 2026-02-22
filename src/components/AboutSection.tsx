@@ -3,6 +3,7 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Code2, Rocket, Sparkles } from "lucide-react";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
+import AuraGlow from "@/components/AuraGlow";
 
 const AboutSection = () => {
   const ref = useRef(null);
@@ -42,13 +43,14 @@ const AboutSection = () => {
             className="grid gap-4"
           >
             {[
-              { icon: Code2, title: "Clean Code", desc: "Writing maintainable, scalable code" },
-              { icon: Rocket, title: "Performance", desc: "Optimized for speed and efficiency" },
-              { icon: Sparkles, title: "Modern UI", desc: "Crafting beautiful user experiences" },
-            ].map(({ icon: Icon, title, desc }, i) => (
-              <div
+              { icon: Code2, title: "Clean Code", desc: "Writing maintainable, scalable code", glow: "190, 95%, 55%" },
+              { icon: Rocket, title: "Performance", desc: "Optimized for speed and efficiency", glow: "260, 60%, 55%" },
+              { icon: Sparkles, title: "Modern UI", desc: "Crafting beautiful user experiences", glow: "320, 70%, 55%" },
+            ].map(({ icon: Icon, title, desc, glow }, i) => (
+              <AuraGlow
                 key={i}
-                className="glass rounded-lg p-5 flex items-start gap-4 hover:box-glow transition-all duration-300 group"
+                glowColor={glow}
+                className="glass rounded-lg p-5 flex items-start gap-4 transition-all duration-300 group cursor-default"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                   <Icon className="w-5 h-5 text-primary" />
@@ -57,7 +59,7 @@ const AboutSection = () => {
                   <h3 className="font-semibold text-foreground mb-1">{title}</h3>
                   <p className="text-muted-foreground text-sm">{desc}</p>
                 </div>
-              </div>
+              </AuraGlow>
             ))}
           </motion.div>
         </div>

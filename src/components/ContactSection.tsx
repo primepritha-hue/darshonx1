@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { Send, MapPin, Mail, Phone } from "lucide-react";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
+import AuraGlow from "@/components/AuraGlow";
 
 const ContactSection = () => {
   const ref = useRef(null);
@@ -42,58 +43,60 @@ const ContactSection = () => {
             </p>
 
             {[
-              { icon: Mail, label: settings?.email || "hello@example.com" },
-              { icon: Phone, label: settings?.phone || "+880 1234-567890" },
-              { icon: MapPin, label: settings?.location || "Dhaka, Bangladesh" },
-            ].map(({ icon: Icon, label }, i) => (
-              <div key={i} className="flex items-center gap-4">
+              { icon: Mail, label: settings?.email || "hello@example.com", glow: "190, 95%, 55%" },
+              { icon: Phone, label: settings?.phone || "+880 1234-567890", glow: "260, 60%, 55%" },
+              { icon: MapPin, label: settings?.location || "Dhaka, Bangladesh", glow: "320, 70%, 55%" },
+            ].map(({ icon: Icon, label, glow }, i) => (
+              <AuraGlow key={i} glowColor={glow} className="flex items-center gap-4 rounded-lg p-2 cursor-default">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <span className="text-muted-foreground">{label}</span>
-              </div>
+              </AuraGlow>
             ))}
           </motion.div>
 
-          <motion.form
+          <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.4 }}
-            onSubmit={handleSubmit}
-            className="glass rounded-2xl p-6 space-y-5"
           >
-            <input
-              type="text"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-            />
-            <input
-              type="email"
-              placeholder="Your Email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-            />
-            <textarea
-              placeholder="Your Message"
-              rows={5}
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              required
-              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-            />
-            <button
-              type="submit"
-              className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity animate-pulse-glow"
-            >
-              <Send className="w-4 h-4" />
-              Send Message
-            </button>
-          </motion.form>
+            <AuraGlow glowColor="190, 95%, 55%" glowSize={300} className="glass rounded-2xl p-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                />
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                />
+                <textarea
+                  placeholder="Your Message"
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  required
+                  className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity animate-pulse-glow"
+                >
+                  <Send className="w-4 h-4" />
+                  Send Message
+                </button>
+              </form>
+            </AuraGlow>
+          </motion.div>
         </div>
       </div>
     </section>
