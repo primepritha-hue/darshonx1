@@ -92,6 +92,7 @@ export type Database = {
           location: string | null
           name: string
           phone: string | null
+          profile_image_url: string | null
           show_discord_profile: boolean | null
           title: string
           updated_at: string
@@ -119,6 +120,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          profile_image_url?: string | null
           show_discord_profile?: boolean | null
           title?: string
           updated_at?: string
@@ -146,6 +148,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          profile_image_url?: string | null
           show_discord_profile?: boolean | null
           title?: string
           updated_at?: string

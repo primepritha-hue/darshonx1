@@ -88,6 +88,7 @@ const Admin = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [uploadingToolId, setUploadingToolId] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -439,6 +440,48 @@ const Admin = () => {
             {activeTab === "settings" && settings && (
               <div className="glass rounded-2xl p-6 max-w-2xl space-y-5">
                 <h3 className="text-xl font-bold text-foreground mb-4">Site Information</h3>
+                {/* Profile Picture Upload */}
+                <div>
+                  <label className="text-sm text-muted-foreground mb-2 block">Profile Picture</label>
+                  <div className="flex items-center gap-4">
+                    {(settings as any).profile_image_url ? (
+                      <img src={(settings as any).profile_image_url} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-border/50" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-muted/50 border-2 border-border/50 flex items-center justify-center">
+                        <User className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border/50 hover:border-primary/40 transition-colors cursor-pointer">
+                        <Upload className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">{uploadingProfilePic ? "Uploading..." : "Upload Photo"}</span>
+                        <input type="file" accept="image/*" className="hidden" disabled={uploadingProfilePic} onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !settings) return;
+                          setUploadingProfilePic(true);
+                          const ext = file.name.split('.').pop();
+                          const filePath = `profile.${ext}`;
+                          const { error: uploadError } = await supabase.storage.from("profile-images").upload(filePath, file, { upsert: true });
+                          if (uploadError) { toast.error(uploadError.message); setUploadingProfilePic(false); return; }
+                          const { data: urlData } = supabase.storage.from("profile-images").getPublicUrl(filePath);
+                          const profileUrl = urlData.publicUrl + '?t=' + Date.now();
+                          await supabase.from("site_settings").update({ profile_image_url: profileUrl } as any).eq("id", settings.id);
+                          setSettings({ ...settings, profile_image_url: profileUrl } as any);
+                          toast.success("Profile picture uploaded!");
+                          setUploadingProfilePic(false);
+                        }} />
+                      </label>
+                      {(settings as any).profile_image_url && (
+                        <button onClick={async () => {
+                          await supabase.from("site_settings").update({ profile_image_url: null } as any).eq("id", settings.id);
+                          setSettings({ ...settings, profile_image_url: null } as any);
+                          toast.success("Profile picture removed");
+                        }} className="text-xs text-destructive hover:underline">Remove</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {(["name", "title", "bio", "email", "phone", "location", "github_url", "linkedin_url"] as const).map((field) => (
                   <div key={field}>
                     <label className="text-sm text-muted-foreground capitalize mb-1 block">
