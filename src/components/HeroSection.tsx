@@ -50,7 +50,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
         >
           <p className="font-mono text-sm md:text-base mb-6 tracking-[0.3em] uppercase text-glow-gold" style={{ color: "hsl(40, 90%, 55%)" }}>
-            <TypingEffect text="// developer.init()" speed={60} delay={500} />
+            <TypingEffect text={settings?.hero_tagline || "// developer.init()"} speed={60} delay={500} />
           </p>
         </motion.div>
 

@@ -11,6 +11,12 @@ export type SiteSettings = {
   location: string;
   github_url: string;
   linkedin_url: string;
+  brand_name: string;
+  hero_tagline: string;
+  contact_intro: string;
+  footer_text: string;
+  about_heading: string;
+  about_features: { title: string; desc: string }[];
 };
 
 export type Skill = {
@@ -36,7 +42,7 @@ export const useSiteSettings = () =>
     queryFn: async () => {
       const { data, error } = await supabase.from("site_settings").select("*").limit(1).single();
       if (error) throw error;
-      return data as SiteSettings;
+      return data as unknown as SiteSettings;
     },
   });
 

@@ -35,7 +35,7 @@ const ContactSection = () => {
           <ScrollReveal direction="left" blur delay={0.15}>
             <div className="space-y-6">
               <p className="text-muted-foreground text-lg leading-relaxed font-light">
-                Have a project in mind or just want to say hi? Feel free to reach out.
+                {settings?.contact_intro || "Have a project in mind or just want to say hi? Feel free to reach out."}
               </p>
 
               {[
