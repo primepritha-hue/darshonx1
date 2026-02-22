@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_usage: {
+        Row: {
+          count: number
+          id: string
+          used_at: string
+          visitor_id: string
+        }
+        Insert: {
+          count?: number
+          id?: string
+          used_at?: string
+          visitor_id: string
+        }
+        Update: {
+          count?: number
+          id?: string
+          used_at?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
@@ -57,6 +78,7 @@ export type Database = {
           contact_intro: string
           email: string | null
           footer_text: string
+          general_chat_daily_limit: number
           github_url: string | null
           hero_tagline: string
           id: string
@@ -76,6 +98,7 @@ export type Database = {
           contact_intro?: string
           email?: string | null
           footer_text?: string
+          general_chat_daily_limit?: number
           github_url?: string | null
           hero_tagline?: string
           id?: string
@@ -95,6 +118,7 @@ export type Database = {
           contact_intro?: string
           email?: string | null
           footer_text?: string
+          general_chat_daily_limit?: number
           github_url?: string | null
           hero_tagline?: string
           id?: string
