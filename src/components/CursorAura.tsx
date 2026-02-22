@@ -18,7 +18,6 @@ const CursorAura = () => {
         if (outerRef.current) outerRef.current.style.opacity = "1";
         if (innerRef.current) innerRef.current.style.opacity = "1";
       }
-      // Inner dot moves instantly
       if (innerRef.current) {
         innerRef.current.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 4}px)`;
       }
@@ -31,7 +30,6 @@ const CursorAura = () => {
     };
 
     const animate = () => {
-      // Smooth lerp for outer glow
       outerPos.current.x += (mouse.current.x - outerPos.current.x) * 0.15;
       outerPos.current.y += (mouse.current.y - outerPos.current.y) * 0.15;
       if (outerRef.current) {
@@ -60,7 +58,7 @@ const CursorAura = () => {
           width: 400,
           height: 400,
           opacity: 0,
-          background: "radial-gradient(circle, hsla(190, 95%, 55%, 0.06) 0%, hsla(260, 60%, 55%, 0.03) 40%, transparent 70%)",
+          background: "radial-gradient(circle, hsla(160, 70%, 45%, 0.05) 0%, hsla(40, 90%, 55%, 0.03) 30%, hsla(330, 75%, 55%, 0.02) 50%, transparent 70%)",
         }}
       />
       <div
@@ -70,8 +68,8 @@ const CursorAura = () => {
           width: 8,
           height: 8,
           opacity: 0,
-          background: "hsla(190, 95%, 70%, 0.5)",
-          boxShadow: "0 0 15px 5px hsla(190, 95%, 55%, 0.3), 0 0 40px 10px hsla(260, 60%, 55%, 0.15)",
+          background: "hsla(160, 70%, 65%, 0.6)",
+          boxShadow: "0 0 12px 4px hsla(160, 70%, 45%, 0.3), 0 0 30px 8px hsla(40, 90%, 55%, 0.1)",
         }}
       />
     </div>

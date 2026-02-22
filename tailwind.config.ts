@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Outfit", "sans-serif"],
+        mono: ["Space Mono", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -53,10 +53,11 @@ export default {
         },
         galaxy: {
           deep: "hsl(var(--galaxy-deep))",
-          nebula: "hsl(var(--galaxy-nebula))",
-          cyan: "hsl(var(--galaxy-cyan))",
-          purple: "hsl(var(--galaxy-purple))",
-          pink: "hsl(var(--galaxy-pink))",
+          void: "hsl(var(--galaxy-void))",
+          emerald: "hsl(var(--galaxy-emerald))",
+          gold: "hsl(var(--galaxy-gold))",
+          magenta: "hsl(var(--galaxy-magenta))",
+          teal: "hsl(var(--galaxy-teal))",
           star: "hsl(var(--galaxy-star))",
         },
         sidebar: {
