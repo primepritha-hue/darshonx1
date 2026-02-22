@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Github, Linkedin, Mail } from "lucide-react";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
+import ParticleBurst from "./ParticleBurst";
+import TypingEffect from "./TypingEffect";
 
 const HeroSection = () => {
   const { data: settings } = useSiteSettings();
+  const [nameRevealed, setNameRevealed] = useState(false);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <ParticleBurst />
       {/* Aurora blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -45,7 +50,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
         >
           <p className="font-mono text-sm md:text-base mb-6 tracking-[0.3em] uppercase text-glow-gold" style={{ color: "hsl(40, 90%, 55%)" }}>
-            &#47;&#47; developer.init()
+            <TypingEffect text="// developer.init()" speed={60} delay={500} />
           </p>
         </motion.div>
 
@@ -56,7 +61,14 @@ const HeroSection = () => {
           className="text-5xl md:text-7xl lg:text-9xl font-black mb-6 leading-[0.9] tracking-tight"
         >
           <span className="text-foreground">I'm </span>
-          <span className="gradient-text text-glow-strong">{settings?.name || "Your Name"}</span>
+          <span className="gradient-text text-glow-strong">
+            <TypingEffect
+              text={settings?.name || "Your Name"}
+              speed={100}
+              delay={2200}
+              onComplete={() => setNameRevealed(true)}
+            />
+          </span>
         </motion.h1>
 
         <motion.div
