@@ -24,6 +24,7 @@ type SiteSettings = {
   footer_text: string;
   about_heading: string;
   about_features: AboutFeature[];
+  ai_prompt: string;
 };
 
 type Skill = {
@@ -119,6 +120,7 @@ const Admin = () => {
         footer_text: settings.footer_text,
         about_heading: settings.about_heading,
         about_features: JSON.parse(JSON.stringify(settings.about_features)),
+        ai_prompt: settings.ai_prompt,
       })
       .eq("id", settings.id);
 
@@ -377,6 +379,19 @@ const Admin = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* AI Prompt */}
+                <div className="glass rounded-2xl p-6 space-y-4">
+                  <h3 className="text-xl font-bold text-foreground">AI Chatbot Prompt</h3>
+                  <p className="text-xs text-muted-foreground">Portfolio data (name, skills, projects) স্বয়ংক্রিয়ভাবে যোগ হবে। এখানে শুধু behavior/tone instructions দিন।</p>
+                  <textarea
+                    value={settings.ai_prompt || ""}
+                    onChange={(e) => setSettings({ ...settings, ai_prompt: e.target.value })}
+                    rows={6}
+                    className={`${inputClass} resize-none font-mono text-xs`}
+                    placeholder="You are a helpful portfolio AI assistant..."
+                  />
                 </div>
 
                 <button

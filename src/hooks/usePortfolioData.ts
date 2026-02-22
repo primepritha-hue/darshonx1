@@ -17,6 +17,7 @@ export type SiteSettings = {
   footer_text: string;
   about_heading: string;
   about_features: { title: string; desc: string }[];
+  ai_prompt: string;
 };
 
 export type Skill = {
