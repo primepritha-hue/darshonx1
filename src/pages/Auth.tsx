@@ -22,7 +22,7 @@ const Auth = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate("/admin");
+      window.location.href = `${window.location.origin}/admin`;
     }
     setLoading(false);
   };
