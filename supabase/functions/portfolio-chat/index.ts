@@ -17,6 +17,8 @@ serve(async (req) => {
 
     // Fetch settings
     const { data: settings } = await supabase.from("site_settings").select("*").limit(1).single();
+    const botName = settings?.chatbot_name || "Portfolio AI";
+    const apiProvider = settings?.chatbot_api_provider || "lovable";
 
     // ── General mode (Longcat API) ──
     if (mode === "general") {
@@ -29,8 +31,6 @@ serve(async (req) => {
 
       const dailyLimit = settings?.general_chat_daily_limit ?? 10;
       const vid = visitor_id || "anonymous";
-
-      // Check usage
       const today = new Date().toISOString().split("T")[0];
       const { data: usage } = await supabase
         .from("chat_usage")
@@ -43,30 +43,22 @@ serve(async (req) => {
       if (currentCount >= dailyLimit) {
         return new Response(JSON.stringify({
           error: `আজকের দৈনিক সীমা (${dailyLimit} টি মেসেজ) শেষ হয়ে গেছে। আগামীকাল আবার চেষ্টা করুন।`,
-          limit_reached: true,
-          remaining: 0,
-        }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+          limit_reached: true, remaining: 0,
+        }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Increment usage
       await supabase.from("chat_usage").upsert(
         { visitor_id: vid, used_at: today, count: currentCount + 1 },
         { onConflict: "visitor_id,used_at" }
       );
 
-      // Call Longcat API
       const response = await fetch("https://api.longcat.chat/openai/v1/chat/completions", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${LONGCAT_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${LONGCAT_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "LongCat-Flash-Chat",
           messages: [
-            { role: "system", content: "You are a helpful assistant. Respond in the same language the user writes in. Be concise and helpful." },
+            { role: "system", content: `Your name is "${botName}". When someone asks your name, always say your name is "${botName}". For greetings like hi/hello, respond warmly and introduce yourself as ${botName}. Respond in the same language the user writes in. Be concise and helpful.` },
             ...messages,
           ],
           stream: true,
@@ -81,20 +73,12 @@ serve(async (req) => {
         });
       }
 
-      const remaining = dailyLimit - (currentCount + 1);
       return new Response(response.body, {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "text/event-stream",
-          "X-Remaining": String(remaining),
-        },
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream", "X-Remaining": String(dailyLimit - (currentCount + 1)) },
       });
     }
 
-    // ── Portfolio mode (default, Lovable AI) ──
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
+    // ── Portfolio mode ──
     const [skillsRes, projectsRes] = await Promise.all([
       supabase.from("skills").select("name, level").order("sort_order"),
       supabase.from("projects").select("title, description, tags, github_url, live_url").order("sort_order"),
@@ -106,6 +90,9 @@ serve(async (req) => {
 
     const portfolioContext = `
 ${customPrompt}
+
+Your name is "${botName}". When someone asks your name, always say your name is "${botName}".
+For greetings like hi, hello, hey — respond warmly, introduce yourself as ${botName}, and mention you can help with questions about ${settings?.name || "the developer"}'s portfolio.
 
 You are ${settings?.name || "a developer"}'s portfolio assistant.
 
@@ -127,35 +114,45 @@ Additional rules:
 - If asked something unrelated to the portfolio, politely redirect.
 `;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: portfolioContext },
-          ...messages,
-        ],
-        stream: true,
-      }),
-    });
+    // Choose API based on admin setting
+    let response: Response;
+
+    if (apiProvider === "longcat") {
+      const LONGCAT_API_KEY = Deno.env.get("LONGCAT_API_KEY");
+      if (!LONGCAT_API_KEY) throw new Error("LONGCAT_API_KEY is not configured");
+
+      response = await fetch("https://api.longcat.chat/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LONGCAT_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "LongCat-Flash-Chat",
+          messages: [{ role: "system", content: portfolioContext }, ...messages],
+          stream: true,
+        }),
+      });
+    } else {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [{ role: "system", content: portfolioContext }, ...messages],
+          stream: true,
+        }),
+      });
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("AI error:", response.status, t);
       return new Response(JSON.stringify({ error: "AI service error" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

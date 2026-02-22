@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Briefcase, Globe } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type ChatMode = "portfolio" | "general";
@@ -18,6 +19,8 @@ const getVisitorId = () => {
 };
 
 const AIChatBubble = () => {
+  const { data: siteSettings } = useSiteSettings();
+  const botName = siteSettings?.chatbot_name || "Portfolio AI";
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<ChatMode>("portfolio");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -157,7 +160,7 @@ const AIChatBubble = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    {mode === "portfolio" ? "Portfolio AI" : "General AI"}
+                    {mode === "portfolio" ? botName : "General AI"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {mode === "portfolio" ? "Ask about this developer" : "Ask anything"}

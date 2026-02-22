@@ -26,6 +26,8 @@ type SiteSettings = {
   about_features: AboutFeature[];
   ai_prompt: string;
   general_chat_daily_limit: number;
+  chatbot_name: string;
+  chatbot_api_provider: string;
 };
 
 type Skill = {
@@ -123,6 +125,8 @@ const Admin = () => {
         about_features: JSON.parse(JSON.stringify(settings.about_features)),
         ai_prompt: settings.ai_prompt,
         general_chat_daily_limit: settings.general_chat_daily_limit,
+        chatbot_name: settings.chatbot_name,
+        chatbot_api_provider: settings.chatbot_api_provider,
       })
       .eq("id", settings.id);
 
@@ -383,17 +387,45 @@ const Admin = () => {
                   ))}
                 </div>
 
-                {/* AI Prompt */}
+                {/* Chatbot Settings */}
                 <div className="glass rounded-2xl p-6 space-y-4">
-                  <h3 className="text-xl font-bold text-foreground">AI Chatbot Prompt</h3>
-                  <p className="text-xs text-muted-foreground">Portfolio data (name, skills, projects) স্বয়ংক্রিয়ভাবে যোগ হবে। এখানে শুধু behavior/tone instructions দিন।</p>
-                  <textarea
-                    value={settings.ai_prompt || ""}
-                    onChange={(e) => setSettings({ ...settings, ai_prompt: e.target.value })}
-                    rows={6}
-                    className={`${inputClass} resize-none font-mono text-xs`}
-                    placeholder="You are a helpful portfolio AI assistant..."
-                  />
+                  <h3 className="text-xl font-bold text-foreground">AI Chatbot Settings</h3>
+                  
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Bot এর নাম</label>
+                    <input
+                      value={settings.chatbot_name || ""}
+                      onChange={(e) => setSettings({ ...settings, chatbot_name: e.target.value })}
+                      className={inputClass}
+                      placeholder="Portfolio AI"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Visitor যখন bot এর নাম জিজ্ঞেস করবে, এই নামটি বলবে।</p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">API Provider</label>
+                    <select
+                      value={settings.chatbot_api_provider || "lovable"}
+                      onChange={(e) => setSettings({ ...settings, chatbot_api_provider: e.target.value })}
+                      className={inputClass}
+                    >
+                      <option value="lovable">Lovable AI (Gemini)</option>
+                      <option value="longcat">Longcat.chat</option>
+                    </select>
+                    <p className="text-xs text-muted-foreground mt-1">Portfolio mode এ কোন AI API ব্যবহার হবে তা নির্বাচন করুন।</p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">AI Prompt</label>
+                    <textarea
+                      value={settings.ai_prompt || ""}
+                      onChange={(e) => setSettings({ ...settings, ai_prompt: e.target.value })}
+                      rows={6}
+                      className={`${inputClass} resize-none font-mono text-xs`}
+                      placeholder="You are a helpful portfolio AI assistant..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Portfolio data স্বয়ংক্রিয়ভাবে যোগ হবে। শুধু behavior/tone instructions দিন।</p>
+                  </div>
                 </div>
 
                 {/* General Chat Limit */}

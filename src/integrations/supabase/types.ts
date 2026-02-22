@@ -75,6 +75,8 @@ export type Database = {
           ai_prompt: string
           bio: string | null
           brand_name: string
+          chatbot_api_provider: string
+          chatbot_name: string
           contact_intro: string
           email: string | null
           footer_text: string
@@ -95,6 +97,8 @@ export type Database = {
           ai_prompt?: string
           bio?: string | null
           brand_name?: string
+          chatbot_api_provider?: string
+          chatbot_name?: string
           contact_intro?: string
           email?: string | null
           footer_text?: string
@@ -115,6 +119,8 @@ export type Database = {
           ai_prompt?: string
           bio?: string | null
           brand_name?: string
+          chatbot_api_provider?: string
+          chatbot_name?: string
           contact_intro?: string
           email?: string | null
           footer_text?: string
