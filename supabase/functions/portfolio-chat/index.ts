@@ -29,8 +29,12 @@ serve(async (req) => {
     const skills = skillsRes.data || [];
     const projects = projectsRes.data || [];
 
+    const customPrompt = settings?.ai_prompt || "You are a helpful portfolio AI assistant. Answer questions about the developer's skills, projects, and experience. Be concise and friendly.";
+
     const portfolioContext = `
-You are ${settings?.name || "a developer"}'s portfolio AI assistant. You speak in a friendly, helpful manner.
+${customPrompt}
+
+You are ${settings?.name || "a developer"}'s portfolio assistant.
 
 About ${settings?.name || "the developer"}:
 - Title: ${settings?.title || "Full-Stack Developer"}
@@ -45,11 +49,9 @@ Skills: ${skills.map((s: any) => `${s.name} (${s.level}%)`).join(", ")}
 Projects:
 ${projects.map((p: any) => `- ${p.title}: ${p.description || "No description"} [Tags: ${(p.tags || []).join(", ")}]${p.github_url ? ` GitHub: ${p.github_url}` : ""}${p.live_url ? ` Live: ${p.live_url}` : ""}`).join("\n")}
 
-Instructions:
-- Answer questions about this developer's skills, projects, experience, and contact info.
-- Be concise but helpful. Use the portfolio data above to give accurate answers.
-- If asked something unrelated to the portfolio, politely redirect to portfolio topics.
+Additional rules:
 - Respond in the same language the user writes in.
+- If asked something unrelated to the portfolio, politely redirect.
 `;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

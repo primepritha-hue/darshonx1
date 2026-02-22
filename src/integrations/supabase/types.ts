@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           about_features: Json
           about_heading: string
+          ai_prompt: string
           bio: string | null
           brand_name: string
           contact_intro: string
@@ -69,6 +70,7 @@ export type Database = {
         Insert: {
           about_features?: Json
           about_heading?: string
+          ai_prompt?: string
           bio?: string | null
           brand_name?: string
           contact_intro?: string
@@ -87,6 +89,7 @@ export type Database = {
         Update: {
           about_features?: Json
           about_heading?: string
+          ai_prompt?: string
           bio?: string | null
           brand_name?: string
           contact_intro?: string
