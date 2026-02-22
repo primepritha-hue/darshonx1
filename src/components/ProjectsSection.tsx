@@ -2,6 +2,14 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { ExternalLink, Github, Folder } from "lucide-react";
 import { useProjects, type Project } from "@/hooks/usePortfolioData";
+import AuraGlow from "@/components/AuraGlow";
+
+const glowColors = [
+  "190, 95%, 55%",
+  "260, 60%, 55%",
+  "320, 70%, 55%",
+  "45, 100%, 60%",
+];
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const ref = useRef(null);
@@ -13,37 +21,41 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.15 }}
-      className="glass rounded-2xl p-6 group hover:box-glow transition-all duration-500 flex flex-col"
     >
-      <div className="flex items-center justify-between mb-4">
-        <Folder className="w-10 h-10 text-primary" />
-        <div className="flex gap-3">
-          <a href={project.github_url} className="text-muted-foreground hover:text-primary transition-colors">
-            <Github className="w-5 h-5" />
-          </a>
-          <a href={project.live_url} className="text-muted-foreground hover:text-primary transition-colors">
-            <ExternalLink className="w-5 h-5" />
-          </a>
+      <AuraGlow
+        glowColor={glowColors[index % glowColors.length]}
+        className="glass rounded-2xl p-6 group transition-all duration-500 flex flex-col h-full cursor-default"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <Folder className="w-10 h-10 text-primary" />
+          <div className="flex gap-3">
+            <a href={project.github_url} className="text-muted-foreground hover:text-primary transition-colors relative z-20">
+              <Github className="w-5 h-5" />
+            </a>
+            <a href={project.live_url} className="text-muted-foreground hover:text-primary transition-colors relative z-20">
+              <ExternalLink className="w-5 h-5" />
+            </a>
+          </div>
         </div>
-      </div>
 
-      <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-        {project.title}
-      </h3>
-      <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">
-        {project.description}
-      </p>
+        <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+          {project.title}
+        </h3>
+        <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">
+          {project.description}
+        </p>
 
-      <div className="flex flex-wrap gap-2">
-        {(project.tags || []).map((tag) => (
-          <span
-            key={tag}
-            className="text-xs font-mono text-primary/80 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+        <div className="flex flex-wrap gap-2">
+          {(project.tags || []).map((tag) => (
+            <span
+              key={tag}
+              className="text-xs font-mono text-primary/80 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </AuraGlow>
     </motion.div>
   );
 };

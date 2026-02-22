@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useSkills } from "@/hooks/usePortfolioData";
+import AuraGlow from "@/components/AuraGlow";
 
 const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: number }) => {
   const ref = useRef(null);
@@ -47,11 +48,13 @@ const SkillsSection = () => {
           </h2>
         </motion.div>
 
-        <div className="max-w-2xl mx-auto glass rounded-2xl p-8 space-y-6">
-          {(skills || []).map((skill, i) => (
-            <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.1} />
-          ))}
-        </div>
+        <AuraGlow className="max-w-2xl mx-auto glass rounded-2xl p-8" glowSize={300}>
+          <div className="space-y-6">
+            {(skills || []).map((skill, i) => (
+              <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.1} />
+            ))}
+          </div>
+        </AuraGlow>
       </div>
     </section>
   );
