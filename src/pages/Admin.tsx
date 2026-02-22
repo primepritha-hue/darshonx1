@@ -97,7 +97,7 @@ const Admin = () => {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      navigate("/auth");
+      window.location.href = `${window.location.origin}/auth`;
       return;
     }
 
@@ -109,7 +109,7 @@ const Admin = () => {
 
     if (!roles || roles.length === 0) {
       toast.error("You don't have admin access");
-      navigate("/");
+      window.location.href = window.location.origin;
       return;
     }
 
@@ -136,7 +136,7 @@ const Admin = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    window.location.href = window.location.origin;
   };
 
   const saveSettings = async () => {
