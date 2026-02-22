@@ -161,6 +161,51 @@ export type Database = {
         }
         Relationships: []
       }
+      tools: {
+        Row: {
+          allow_download: boolean
+          created_at: string
+          description: string
+          file_name: string | null
+          file_url: string | null
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string | null
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          allow_download?: boolean
+          created_at?: string
+          description?: string
+          file_name?: string | null
+          file_url?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug?: string | null
+          sort_order?: number
+          type?: string
+        }
+        Update: {
+          allow_download?: boolean
+          created_at?: string
+          description?: string
+          file_name?: string | null
+          file_url?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string | null
+          sort_order?: number
+          type?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

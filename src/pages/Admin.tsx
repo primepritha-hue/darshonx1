@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import StarField from "@/components/StarField";
-import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft, Layout } from "lucide-react";
+import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft, Layout, Wrench, Upload, Download, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 type AboutFeature = { title: string; desc: string };
@@ -47,16 +47,32 @@ type Project = {
   sort_order: number;
 };
 
+type Tool = {
+  id: string;
+  name: string;
+  description: string;
+  type: "builtin" | "download";
+  slug: string | null;
+  icon: string;
+  file_url: string | null;
+  file_name: string | null;
+  is_active: boolean;
+  allow_download: boolean;
+  sort_order: number;
+};
+
 const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools">("settings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [saving, setSaving] = useState(false);
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [uploadingToolId, setUploadingToolId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -87,15 +103,17 @@ const Admin = () => {
   };
 
   const loadData = async () => {
-    const [settingsRes, skillsRes, projectsRes] = await Promise.all([
+    const [settingsRes, skillsRes, projectsRes, toolsRes] = await Promise.all([
       supabase.from("site_settings").select("*").limit(1).single(),
       supabase.from("skills").select("*").order("sort_order"),
       supabase.from("projects").select("*").order("sort_order"),
+      supabase.from("tools").select("*").order("sort_order"),
     ]);
 
     if (settingsRes.data) setSettings(settingsRes.data as unknown as SiteSettings);
     if (skillsRes.data) setSkills(skillsRes.data as Skill[]);
     if (projectsRes.data) setProjects(projectsRes.data as Project[]);
+    if (toolsRes.data) setTools(toolsRes.data as unknown as Tool[]);
   };
 
   const handleLogout = async () => {
@@ -228,6 +246,67 @@ const Admin = () => {
     });
   };
 
+  // ── Tools CRUD ──
+  const addTool = async () => {
+    const { data, error } = await supabase
+      .from("tools")
+      .insert({ name: "New Tool", description: "Tool description", type: "download", sort_order: tools.length, is_active: false })
+      .select()
+      .single();
+    if (error) toast.error(error.message);
+    else if (data) setTools([...tools, data as unknown as Tool]);
+  };
+
+  const updateTool = (id: string, updates: Partial<Tool>) => {
+    setTools(tools.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  };
+
+  const saveTool = async (tool: Tool) => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("tools")
+      .update({
+        name: tool.name,
+        description: tool.description,
+        is_active: tool.is_active,
+        allow_download: tool.allow_download,
+        sort_order: tool.sort_order,
+        file_url: tool.file_url,
+        file_name: tool.file_name,
+      })
+      .eq("id", tool.id);
+    if (error) toast.error(error.message);
+    else toast.success("Tool saved!");
+    setSaving(false);
+  };
+
+  const deleteTool = async (tool: Tool) => {
+    if (tool.type === "builtin") { toast.error("Built-in tools can't be deleted"); return; }
+    if (tool.file_url) {
+      const path = tool.file_url.split("/tool-files/")[1];
+      if (path) await supabase.storage.from("tool-files").remove([decodeURIComponent(path)]);
+    }
+    const { error } = await supabase.from("tools").delete().eq("id", tool.id);
+    if (error) toast.error(error.message);
+    else setTools(tools.filter((t) => t.id !== tool.id));
+  };
+
+  const uploadToolFile = async (toolId: string, file: File) => {
+    setUploadingToolId(toolId);
+    const filePath = `${toolId}/${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("tool-files").upload(filePath, file, { upsert: true });
+    if (uploadError) { toast.error(uploadError.message); setUploadingToolId(null); return; }
+    const { data: urlData } = supabase.storage.from("tool-files").getPublicUrl(filePath);
+    const fileUrl = urlData.publicUrl;
+    const { error } = await supabase.from("tools").update({ file_url: fileUrl, file_name: file.name }).eq("id", toolId);
+    if (error) toast.error(error.message);
+    else {
+      setTools(tools.map((t) => (t.id === toolId ? { ...t, file_url: fileUrl, file_name: file.name } : t)));
+      toast.success("File uploaded!");
+    }
+    setUploadingToolId(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -247,6 +326,7 @@ const Admin = () => {
     { key: "content" as const, label: "Content", icon: Layout },
     { key: "skills" as const, label: "Skills", icon: Code2 },
     { key: "projects" as const, label: "Projects", icon: FolderOpen },
+    { key: "tools" as const, label: "Tools", icon: Wrench },
   ];
 
   return (
@@ -578,6 +658,81 @@ const Admin = () => {
                         <Trash2 className="w-3 h-3" />
                         Delete
                       </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tools Tab */}
+            {activeTab === "tools" && (
+              <div className="max-w-2xl space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-foreground">Tools Management</h3>
+                  <button
+                    onClick={addTool}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Download Tool
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Built-in tools শুধু on/off করা যাবে। নতুন downloadable tool যোগ করে file upload করুন।</p>
+
+                {tools.map((tool) => (
+                  <div key={tool.id} className="glass rounded-xl p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          tool.type === "builtin" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"
+                        }`}>
+                          {tool.type === "builtin" ? "Built-in" : "Download"}
+                        </span>
+                        <span className="text-sm font-medium text-foreground">{tool.name}</span>
+                      </div>
+                      <button
+                        onClick={() => { updateTool(tool.id, { is_active: !tool.is_active }); }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          tool.is_active ? "bg-green-500/10 text-green-400" : "bg-muted/30 text-muted-foreground"
+                        }`}
+                      >
+                        {tool.is_active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                        {tool.is_active ? "Active" : "Hidden"}
+                      </button>
+                    </div>
+
+                    <input value={tool.name} onChange={(e) => updateTool(tool.id, { name: e.target.value })} placeholder="Tool name" className={inputSmClass} />
+                    <input value={tool.description} onChange={(e) => updateTool(tool.id, { description: e.target.value })} placeholder="Description" className={inputSmClass} />
+
+                    {tool.type === "download" && (
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <input type="checkbox" checked={tool.allow_download} onChange={(e) => updateTool(tool.id, { allow_download: e.target.checked })} className="accent-primary" />
+                          Allow user download
+                        </label>
+                        {tool.file_name && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/20 rounded-lg px-3 py-2">
+                            <Download className="w-3 h-3" />
+                            <span>{tool.file_name}</span>
+                          </div>
+                        )}
+                        <label className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-border/50 hover:border-primary/40 transition-colors cursor-pointer">
+                          <Upload className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{uploadingToolId === tool.id ? "Uploading..." : "Upload file"}</span>
+                          <input type="file" className="hidden" disabled={uploadingToolId === tool.id} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadToolFile(tool.id, f); }} />
+                        </label>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 justify-end">
+                      <button onClick={() => saveTool(tool)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors">
+                        <Save className="w-3 h-3" /> Save
+                      </button>
+                      {tool.type !== "builtin" && (
+                        <button onClick={() => deleteTool(tool)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors">
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

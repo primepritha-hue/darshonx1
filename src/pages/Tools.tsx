@@ -1,17 +1,21 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileText, QrCode, KeyRound, MapPin, Download, Copy, RefreshCw, ArrowLeft } from "lucide-react";
+import { FileText, QrCode, KeyRound, MapPin, Download, Copy, RefreshCw, ArrowLeft, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import StarField from "@/components/StarField";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
-// ─── PDF Generator ───
+// ─── Built-in Tool Components ───
+
 const PdfGenerator = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const inputClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all";
 
   const generate = () => {
     if (!content.trim()) { toast.error("Content is required"); return; }
@@ -25,8 +29,6 @@ const PdfGenerator = () => {
     toast.success("PDF downloaded!");
   };
 
-  const inputClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all";
-
   return (
     <div className="space-y-4">
       <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Document title" className={inputClass} />
@@ -38,10 +40,10 @@ const PdfGenerator = () => {
   );
 };
 
-// ─── QR Code Generator ───
 const QrGenerator = () => {
   const [text, setText] = useState("");
   const qrRef = useRef<HTMLDivElement>(null);
+  const inputClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all";
 
   const download = () => {
     const svg = qrRef.current?.querySelector("svg");
@@ -54,8 +56,6 @@ const QrGenerator = () => {
     URL.revokeObjectURL(url);
     toast.success("QR Code downloaded!");
   };
-
-  const inputClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all";
 
   return (
     <div className="space-y-4">
@@ -74,7 +74,6 @@ const QrGenerator = () => {
   );
 };
 
-// ─── Password Generator ───
 const PasswordGenerator = () => {
   const [length, setLength] = useState(16);
   const [includeUpper, setIncludeUpper] = useState(true);
@@ -136,7 +135,6 @@ const PasswordGenerator = () => {
   );
 };
 
-// ─── Location Tracker ───
 const LocationTracker = () => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -144,17 +142,10 @@ const LocationTracker = () => {
 
   const getLocation = () => {
     if (!navigator.geolocation) { setError("Geolocation is not supported"); return; }
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      }
+      (pos) => { setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLoading(false); },
+      (err) => { setError(err.message); setLoading(false); }
     );
   };
 
@@ -185,12 +176,7 @@ const LocationTracker = () => {
               <Copy className="w-4 h-4" />
             </button>
           </div>
-          <a
-            href={`https://www.google.com/maps?q=${location.lat},${location.lng}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-center text-xs text-primary hover:underline"
-          >
+          <a href={`https://www.google.com/maps?q=${location.lat},${location.lng}`} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-primary hover:underline">
             Open in Google Maps →
           </a>
         </div>
@@ -199,18 +185,117 @@ const LocationTracker = () => {
   );
 };
 
+// ─── Download Tool Component ───
+const DownloadTool = ({ fileUrl, fileName, allowDownload }: { fileUrl: string; fileName: string; allowDownload: boolean }) => {
+  if (!allowDownload) {
+    return <p className="text-sm text-muted-foreground">এই tool টি শুধুমাত্র দেখার জন্য। Download বন্ধ করা আছে।</p>;
+  }
+  return (
+    <div className="flex flex-col items-center gap-4 py-4">
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+        <Download className="w-8 h-8 text-primary" />
+      </div>
+      <p className="text-sm text-muted-foreground">{fileName}</p>
+      <a
+        href={fileUrl}
+        download={fileName}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        <Download className="w-4 h-4" /> Download File
+      </a>
+    </div>
+  );
+};
+
+// ─── Icon map for builtin tools ───
+const builtinIcons: Record<string, React.ComponentType<any>> = {
+  "file-text": FileText,
+  "qr-code": QrCode,
+  "key-round": KeyRound,
+  "map-pin": MapPin,
+};
+
+const builtinComponents: Record<string, React.ComponentType> = {
+  pdf: PdfGenerator,
+  qr: QrGenerator,
+  password: PasswordGenerator,
+  location: LocationTracker,
+};
+
 // ─── Tools Page ───
-const tools = [
-  { id: "pdf", label: "PDF Generator", icon: FileText, desc: "Create and download PDF documents", component: PdfGenerator },
-  { id: "qr", label: "QR Code", icon: QrCode, desc: "Generate QR codes from any text or URL", component: QrGenerator },
-  { id: "password", label: "Password", icon: KeyRound, desc: "Generate secure random passwords", component: PasswordGenerator },
-  { id: "location", label: "Location", icon: MapPin, desc: "Find your current coordinates", component: LocationTracker },
-];
+type ToolData = {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  slug: string | null;
+  icon: string;
+  file_url: string | null;
+  file_name: string | null;
+  is_active: boolean;
+  allow_download: boolean;
+  sort_order: number;
+};
 
 const Tools = () => {
-  const [activeTool, setActiveTool] = useState("pdf");
   const navigate = useNavigate();
-  const ActiveComponent = tools.find((t) => t.id === activeTool)!.component;
+
+  const { data: toolsData = [], isLoading } = useQuery({
+    queryKey: ["tools"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tools").select("*").eq("is_active", true).order("sort_order");
+      if (error) throw error;
+      return data as unknown as ToolData[];
+    },
+  });
+
+  const [activeToolId, setActiveToolId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (toolsData.length > 0 && !activeToolId) {
+      setActiveToolId(toolsData[0].id);
+    }
+  }, [toolsData, activeToolId]);
+
+  const activeTool = toolsData.find((t) => t.id === activeToolId);
+
+  const renderToolContent = () => {
+    if (!activeTool) return null;
+
+    if (activeTool.type === "builtin" && activeTool.slug) {
+      const Component = builtinComponents[activeTool.slug];
+      return Component ? <Component /> : <p className="text-muted-foreground text-sm">Tool not found.</p>;
+    }
+
+    if (activeTool.type === "download" && activeTool.file_url) {
+      return <DownloadTool fileUrl={activeTool.file_url} fileName={activeTool.file_name || "file"} allowDownload={activeTool.allow_download} />;
+    }
+
+    return <p className="text-muted-foreground text-sm">No file uploaded yet.</p>;
+  };
+
+  const getIcon = (tool: ToolData) => {
+    if (tool.type === "builtin" && builtinIcons[tool.icon]) {
+      const Icon = builtinIcons[tool.icon];
+      return <Icon className="w-4 h-4" />;
+    }
+    if (tool.type === "download") return <Download className="w-4 h-4" />;
+    return <Wrench className="w-4 h-4" />;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="relative min-h-screen">
+        <StarField />
+        <Navbar />
+        <div className="relative z-10 pt-24 flex items-center justify-center">
+          <div className="text-primary animate-pulse">Loading tools...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -218,12 +303,7 @@ const Tools = () => {
       <Navbar />
       <div className="relative z-10 pt-24 pb-16">
         <div className="container mx-auto px-6">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-10"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
             <button onClick={() => navigate("/")} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm mb-4">
               <ArrowLeft className="w-4 h-4" /> Back to Home
             </button>
@@ -231,51 +311,52 @@ const Tools = () => {
             <p className="text-muted-foreground text-sm">Free online utilities to boost your productivity</p>
           </motion.div>
 
-          {/* Tool selector */}
-          <div className="flex gap-2 mb-8 flex-wrap">
-            {tools.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setActiveTool(id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  activeTool === id
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                    : "glass text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </button>
-            ))}
-          </div>
+          {toolsData.length === 0 ? (
+            <div className="glass rounded-2xl p-12 text-center">
+              <Wrench className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+              <p className="text-muted-foreground">No tools available right now.</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-2 mb-8 flex-wrap">
+                {toolsData.map((tool) => (
+                  <button
+                    key={tool.id}
+                    onClick={() => setActiveToolId(tool.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      activeToolId === tool.id
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                        : "glass text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {getIcon(tool)}
+                    {tool.name}
+                  </button>
+                ))}
+              </div>
 
-          {/* Active tool */}
-          <motion.div
-            key={activeTool}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="glass rounded-2xl p-6 md:p-8 max-w-2xl"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              {(() => {
-                const tool = tools.find((t) => t.id === activeTool)!;
-                const Icon = tool.icon;
-                return (
-                  <>
+              {activeTool && (
+                <motion.div
+                  key={activeTool.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="glass rounded-2xl p-6 md:p-8 max-w-2xl"
+                >
+                  <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-primary" />
+                      {getIcon(activeTool)}
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-foreground">{tool.label}</h2>
-                      <p className="text-xs text-muted-foreground">{tool.desc}</p>
+                      <h2 className="text-lg font-bold text-foreground">{activeTool.name}</h2>
+                      <p className="text-xs text-muted-foreground">{activeTool.description}</p>
                     </div>
-                  </>
-                );
-              })()}
-            </div>
-            <ActiveComponent />
-          </motion.div>
+                  </div>
+                  {renderToolContent()}
+                </motion.div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
