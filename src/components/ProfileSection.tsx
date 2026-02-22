@@ -86,11 +86,12 @@ const ProfileSection = () => {
 
   const discordSettings = settings as any;
   const showDiscord = discordSettings?.show_discord_profile !== false;
+  const profileImageUrl = discordSettings?.profile_image_url;
 
   // Use live Discord data if available, fallback to admin settings
   const displayName = discordProfile?.global_name || settings?.name || "Username";
   const username = discordProfile?.username || discordSettings?.discord_username;
-  const avatarUrl = discordProfile?.avatar_url || discordSettings?.discord_avatar_url;
+  const avatarUrl = profileImageUrl || discordProfile?.avatar_url || discordSettings?.discord_avatar_url;
   const bannerUrl = discordProfile?.banner_url;
   const bannerColor = discordProfile?.banner_color;
   const badges = discordProfile?.badges?.length ? discordProfile.badges : (discordSettings?.discord_badges || []);
