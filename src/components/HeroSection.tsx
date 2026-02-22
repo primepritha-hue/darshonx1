@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { ChevronDown, Github, Linkedin, Mail } from "lucide-react";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const HeroSection = () => {
+  const { data: settings } = useSiteSettings();
+
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="container mx-auto px-6 text-center relative z-10">
@@ -22,7 +25,7 @@ const HeroSection = () => {
           className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6"
         >
           <span className="text-foreground">I'm </span>
-          <span className="gradient-text text-glow-strong">Your Name</span>
+          <span className="gradient-text text-glow-strong">{settings?.name || "Your Name"}</span>
         </motion.h1>
 
         <motion.p
@@ -31,7 +34,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.7 }}
           className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10"
         >
-          Full-Stack Developer crafting digital experiences from the cosmos
+          {settings?.title || "Full-Stack Developer"} crafting digital experiences from the cosmos
         </motion.p>
 
         <motion.div
@@ -41,8 +44,8 @@ const HeroSection = () => {
           className="flex items-center justify-center gap-6 mb-16"
         >
           {[
-            { icon: Github, href: "#" },
-            { icon: Linkedin, href: "#" },
+            { icon: Github, href: settings?.github_url || "#" },
+            { icon: Linkedin, href: settings?.linkedin_url || "#" },
             { icon: Mail, href: "#contact" },
           ].map(({ icon: Icon, href }, i) => (
             <a
