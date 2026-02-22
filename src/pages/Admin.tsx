@@ -25,6 +25,7 @@ type SiteSettings = {
   about_heading: string;
   about_features: AboutFeature[];
   ai_prompt: string;
+  general_chat_daily_limit: number;
 };
 
 type Skill = {
@@ -121,6 +122,7 @@ const Admin = () => {
         about_heading: settings.about_heading,
         about_features: JSON.parse(JSON.stringify(settings.about_features)),
         ai_prompt: settings.ai_prompt,
+        general_chat_daily_limit: settings.general_chat_daily_limit,
       })
       .eq("id", settings.id);
 
@@ -392,6 +394,21 @@ const Admin = () => {
                     className={`${inputClass} resize-none font-mono text-xs`}
                     placeholder="You are a helpful portfolio AI assistant..."
                   />
+                </div>
+
+                {/* General Chat Limit */}
+                <div className="glass rounded-2xl p-6 space-y-4">
+                  <h3 className="text-xl font-bold text-foreground">General Chat Daily Limit</h3>
+                  <p className="text-xs text-muted-foreground">প্রতিটি visitor প্রতিদিন কতটি General mode মেসেজ পাঠাতে পারবে সেটি নির্ধারণ করুন।</p>
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={settings.general_chat_daily_limit ?? 10}
+                    onChange={(e) => setSettings({ ...settings, general_chat_daily_limit: parseInt(e.target.value) || 10 })}
+                    className={`${inputClass} w-32`}
+                  />
+                  <p className="text-xs text-muted-foreground">বর্তমান সীমা: <span className="text-primary font-semibold">{settings.general_chat_daily_limit ?? 10}</span> মেসেজ/দিন/visitor</p>
                 </div>
 
                 <button
