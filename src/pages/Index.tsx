@@ -5,6 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import SkillsSection from "@/components/SkillsSection";
 import ProjectsSection from "@/components/ProjectsSection";
+import ProfileSection from "@/components/ProfileSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import AIChatBubble from "@/components/AIChatBubble";
@@ -20,6 +21,7 @@ const Index = () => {
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
+        <ProfileSection />
         <ContactSection />
         <Footer />
       </div>
