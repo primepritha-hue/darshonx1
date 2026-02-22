@@ -18,6 +18,9 @@ export type SiteSettings = {
   about_heading: string;
   about_features: { title: string; desc: string }[];
   ai_prompt: string;
+  general_chat_daily_limit: number;
+  chatbot_name: string;
+  chatbot_api_provider: string;
 };
 
 export type Skill = {
