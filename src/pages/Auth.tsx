@@ -11,34 +11,18 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setMessage("");
 
-    if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        navigate("/admin");
-      }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
     } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage("Check your email to confirm your account!");
-      }
+      navigate("/admin");
     }
     setLoading(false);
   };
@@ -58,20 +42,15 @@ const Auth = () => {
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">
-            {mode === "login" ? "Admin Login" : "Create Account"}
+            Admin Login
           </h2>
           <p className="text-muted-foreground text-center text-sm mb-8">
-            {mode === "login" ? "Sign in to manage your portfolio" : "Register a new account"}
+            Authorized personnel only
           </p>
 
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
               {error}
-            </div>
-          )}
-          {message && (
-            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm">
-              {message}
             </div>
           )}
 
@@ -110,19 +89,9 @@ const Auth = () => {
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <LogIn className="w-4 h-4" />
-              {loading ? "Loading..." : mode === "login" ? "Sign In" : "Sign Up"}
+              {loading ? "Loading..." : "Sign In"}
             </button>
           </form>
-
-          <p className="text-muted-foreground text-sm text-center mt-6">
-            {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setMessage(""); }}
-              className="text-primary hover:underline"
-            >
-              {mode === "login" ? "Sign Up" : "Sign In"}
-            </button>
-          </p>
         </div>
       </motion.div>
     </div>
