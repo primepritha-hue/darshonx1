@@ -1,15 +1,16 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { Send, MapPin, Mail, Phone } from "lucide-react";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const ContactSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { data: settings } = useSiteSettings();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Connect to backend
     alert("Message sent! (Connect backend for real functionality)");
     setFormData({ name: "", email: "", message: "" });
   };
@@ -37,14 +38,13 @@ const ContactSection = () => {
             className="space-y-8"
           >
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Have a project in mind or just want to say hi? Feel free to reach out. 
-              I'm always open to new opportunities and collaborations.
+              Have a project in mind or just want to say hi? Feel free to reach out.
             </p>
 
             {[
-              { icon: Mail, label: "hello@example.com" },
-              { icon: Phone, label: "+880 1234-567890" },
-              { icon: MapPin, label: "Dhaka, Bangladesh" },
+              { icon: Mail, label: settings?.email || "hello@example.com" },
+              { icon: Phone, label: settings?.phone || "+880 1234-567890" },
+              { icon: MapPin, label: settings?.location || "Dhaka, Bangladesh" },
             ].map(({ icon: Icon, label }, i) => (
               <div key={i} className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -62,36 +62,30 @@ const ContactSection = () => {
             onSubmit={handleSubmit}
             className="glass rounded-2xl p-6 space-y-5"
           >
-            <div>
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                placeholder="Your Email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-              />
-            </div>
-            <div>
-              <textarea
-                placeholder="Your Message"
-                rows={5}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                required
-                className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+            <input
+              type="email"
+              placeholder="Your Email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+            <textarea
+              placeholder="Your Message"
+              rows={5}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              required
+              className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+            />
             <button
               type="submit"
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity animate-pulse-glow"

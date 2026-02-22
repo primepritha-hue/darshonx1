@@ -2,10 +2,12 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Code2, Rocket, Sparkles } from "lucide-react";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const AboutSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { data: settings } = useSiteSettings();
 
   return (
     <section id="about" className="relative py-32" ref={ref}>
@@ -28,14 +30,8 @@ const AboutSection = () => {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <p className="text-muted-foreground leading-relaxed mb-6 text-lg">
-              I'm a passionate full-stack developer who loves turning ideas into beautiful, 
-              functional digital experiences. With expertise in modern web technologies, 
-              I build applications that are both visually stunning and performant.
-            </p>
             <p className="text-muted-foreground leading-relaxed text-lg">
-              When I'm not coding, you'll find me exploring new technologies, 
-              contributing to open source, and pushing the boundaries of what's possible on the web.
+              {settings?.bio || "I'm a passionate full-stack developer who loves turning ideas into beautiful, functional digital experiences."}
             </p>
           </motion.div>
 

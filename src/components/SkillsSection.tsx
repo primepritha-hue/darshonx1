@@ -1,16 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-
-const skills = [
-  { name: "React", level: 90 },
-  { name: "TypeScript", level: 85 },
-  { name: "Node.js", level: 80 },
-  { name: "Python", level: 75 },
-  { name: "Next.js", level: 85 },
-  { name: "Tailwind CSS", level: 95 },
-  { name: "PostgreSQL", level: 70 },
-  { name: "Docker", level: 65 },
-];
+import { useSkills } from "@/hooks/usePortfolioData";
 
 const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: number }) => {
   const ref = useRef(null);
@@ -40,6 +30,7 @@ const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: 
 const SkillsSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { data: skills } = useSkills();
 
   return (
     <section id="skills" className="relative py-32" ref={ref}>
@@ -57,8 +48,8 @@ const SkillsSection = () => {
         </motion.div>
 
         <div className="max-w-2xl mx-auto glass rounded-2xl p-8 space-y-6">
-          {skills.map((skill, i) => (
-            <SkillBar key={skill.name} {...skill} delay={i * 0.1} />
+          {(skills || []).map((skill, i) => (
+            <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.1} />
           ))}
         </div>
       </div>
