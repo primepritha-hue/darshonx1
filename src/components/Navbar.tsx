@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Terminal } from "lucide-react";
+import { Menu, X, Terminal, Wrench } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const navItems = [
@@ -14,11 +15,21 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: settings } = useSiteSettings();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const scrollTo = (href: string) => {
     setIsOpen(false);
-    const el = document.querySelector(href);
-    el?.scrollIntoView({ behavior: "smooth" });
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    } else {
+      const el = document.querySelector(href);
+      el?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -44,6 +55,15 @@ const Navbar = () => {
               {item.label}
             </button>
           ))}
+          <button
+            onClick={() => { setIsOpen(false); navigate("/tools"); }}
+            className={`flex items-center gap-1.5 text-xs font-medium tracking-[0.15em] uppercase transition-colors duration-300 ${
+              location.pathname === "/tools" ? "text-primary" : "text-muted-foreground hover:text-primary"
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5" />
+            Tools
+          </button>
         </div>
 
         <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-foreground">
@@ -69,6 +89,15 @@ const Navbar = () => {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => { setIsOpen(false); navigate("/tools"); }}
+                className={`flex items-center gap-2 text-left py-2 text-sm tracking-wide transition-colors ${
+                  location.pathname === "/tools" ? "text-primary" : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Wrench className="w-4 h-4" />
+                Tools
+              </button>
             </div>
           </motion.div>
         )}
