@@ -11,16 +11,16 @@ const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: 
     <div ref={ref} className="group">
       <div className="flex justify-between mb-2">
         <span className="text-foreground font-medium text-sm">{name}</span>
-        <span className="text-primary font-mono text-sm">{level}%</span>
+        <span className="text-secondary font-mono text-xs">{level}%</span>
       </div>
-      <div className="h-2 rounded-full bg-muted overflow-hidden">
+      <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={isInView ? { width: `${level}%` } : {}}
-          transition={{ duration: 1, delay, ease: "easeOut" }}
+          transition={{ duration: 1.2, delay, ease: "easeOut" }}
           className="h-full rounded-full"
           style={{
-            background: `linear-gradient(90deg, hsl(190, 95%, 55%), hsl(260, 60%, 55%))`,
+            background: `linear-gradient(90deg, hsl(160, 70%, 45%), hsl(40, 90%, 55%))`,
           }}
         />
       </div>
@@ -35,6 +35,7 @@ const SkillsSection = () => {
 
   return (
     <section id="skills" className="relative py-32" ref={ref}>
+      <div className="section-divider max-w-xl mx-auto mb-32" />
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -42,16 +43,16 @@ const SkillsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <p className="text-primary font-mono text-sm mb-2">02. Skills</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+          <p className="text-primary font-mono text-xs mb-3 tracking-[0.2em] uppercase">02 — Skills</p>
+          <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
             My <span className="gradient-text">Tech Stack</span>
           </h2>
         </motion.div>
 
-        <AuraGlow className="max-w-2xl mx-auto glass rounded-2xl p-8" glowSize={300}>
-          <div className="space-y-6">
+        <AuraGlow className="max-w-2xl mx-auto glass rounded-2xl p-8" glowSize={300} glowColor="160, 70%, 45%">
+          <div className="space-y-5">
             {(skills || []).map((skill, i) => (
-              <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.1} />
+              <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.08} />
             ))}
           </div>
         </AuraGlow>
