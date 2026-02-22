@@ -11,7 +11,6 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,22 +18,11 @@ const Auth = () => {
     setLoading(true);
     setError("");
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        setError("");
-        setIsSignUp(false);
-        alert("Signup successful! You can now sign in.");
-      }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        navigate("/admin");
-      }
+      navigate("/admin");
     }
     setLoading(false);
   };
@@ -54,10 +42,10 @@ const Auth = () => {
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">
-            {isSignUp ? "Create Account" : "Admin Login"}
+            Admin Login
           </h2>
           <p className="text-muted-foreground text-center text-sm mb-8">
-            {isSignUp ? "Sign up to get started" : "Authorized personnel only"}
+            Authorized personnel only
           </p>
 
           {error && (
@@ -101,14 +89,8 @@ const Auth = () => {
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <LogIn className="w-4 h-4" />
-              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+              {loading ? "Loading..." : "Sign In"}
             </button>
-            <p className="text-center text-sm text-muted-foreground">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-              <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-primary hover:underline">
-                {isSignUp ? "Sign In" : "Sign Up"}
-              </button>
-            </p>
           </form>
         </div>
       </motion.div>
