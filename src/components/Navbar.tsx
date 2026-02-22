@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Terminal } from "lucide-react";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -12,6 +13,7 @@ const navItems = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: settings } = useSiteSettings();
 
   const scrollTo = (href: string) => {
     setIsOpen(false);
@@ -29,7 +31,7 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <button onClick={() => scrollTo("#home")} className="flex items-center gap-2 group">
           <Terminal className="w-5 h-5 text-primary" />
-          <span className="text-lg font-bold gradient-text">Dev.folio</span>
+          <span className="text-lg font-bold gradient-text">{settings?.brand_name || "Dev.folio"}</span>
         </button>
 
         <div className="hidden md:flex items-center gap-8">

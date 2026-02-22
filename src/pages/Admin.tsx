@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import StarField from "@/components/StarField";
-import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft, Layout } from "lucide-react";
 import { toast } from "sonner";
+
+type AboutFeature = { title: string; desc: string };
 
 type SiteSettings = {
   id: string;
@@ -16,6 +18,12 @@ type SiteSettings = {
   location: string;
   github_url: string;
   linkedin_url: string;
+  brand_name: string;
+  hero_tagline: string;
+  contact_intro: string;
+  footer_text: string;
+  about_heading: string;
+  about_features: AboutFeature[];
 };
 
 type Skill = {
@@ -39,7 +47,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content">("settings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -57,7 +65,6 @@ const Admin = () => {
       return;
     }
 
-    // Check admin role
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
@@ -82,7 +89,7 @@ const Admin = () => {
       supabase.from("projects").select("*").order("sort_order"),
     ]);
 
-    if (settingsRes.data) setSettings(settingsRes.data as SiteSettings);
+    if (settingsRes.data) setSettings(settingsRes.data as unknown as SiteSettings);
     if (skillsRes.data) setSkills(skillsRes.data as Skill[]);
     if (projectsRes.data) setProjects(projectsRes.data as Project[]);
   };
@@ -106,6 +113,12 @@ const Admin = () => {
         location: settings.location,
         github_url: settings.github_url,
         linkedin_url: settings.linkedin_url,
+        brand_name: settings.brand_name,
+        hero_tagline: settings.hero_tagline,
+        contact_intro: settings.contact_intro,
+        footer_text: settings.footer_text,
+        about_heading: settings.about_heading,
+        about_features: JSON.parse(JSON.stringify(settings.about_features)),
       })
       .eq("id", settings.id);
 
@@ -183,6 +196,30 @@ const Admin = () => {
     else setProjects(projects.filter((p) => p.id !== id));
   };
 
+  // About features helpers
+  const updateFeature = (index: number, updates: Partial<AboutFeature>) => {
+    if (!settings) return;
+    const features = [...settings.about_features];
+    features[index] = { ...features[index], ...updates };
+    setSettings({ ...settings, about_features: features });
+  };
+
+  const addFeature = () => {
+    if (!settings) return;
+    setSettings({
+      ...settings,
+      about_features: [...settings.about_features, { title: "New Feature", desc: "Description" }],
+    });
+  };
+
+  const removeFeature = (index: number) => {
+    if (!settings) return;
+    setSettings({
+      ...settings,
+      about_features: settings.about_features.filter((_, i) => i !== index),
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -194,8 +231,12 @@ const Admin = () => {
 
   if (!isAdmin) return null;
 
+  const inputClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all";
+  const inputSmClass = "w-full bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all";
+
   const tabs = [
-    { key: "settings" as const, label: "Site Settings", icon: Settings },
+    { key: "settings" as const, label: "Site Info", icon: Settings },
+    { key: "content" as const, label: "Content", icon: Layout },
     { key: "skills" as const, label: "Skills", icon: Code2 },
     { key: "projects" as const, label: "Projects", icon: FolderOpen },
   ];
@@ -254,24 +295,24 @@ const Admin = () => {
             {/* Settings Tab */}
             {activeTab === "settings" && settings && (
               <div className="glass rounded-2xl p-6 max-w-2xl space-y-5">
-                <h3 className="text-xl font-bold text-foreground mb-4">Site Settings</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">Site Information</h3>
                 {(["name", "title", "bio", "email", "phone", "location", "github_url", "linkedin_url"] as const).map((field) => (
                   <div key={field}>
                     <label className="text-sm text-muted-foreground capitalize mb-1 block">
-                      {field.replace("_", " ")}
+                      {field.replace(/_/g, " ")}
                     </label>
                     {field === "bio" ? (
                       <textarea
                         value={settings[field] || ""}
                         onChange={(e) => setSettings({ ...settings, [field]: e.target.value })}
                         rows={4}
-                        className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                        className={`${inputClass} resize-none`}
                       />
                     ) : (
                       <input
                         value={settings[field] || ""}
                         onChange={(e) => setSettings({ ...settings, [field]: e.target.value })}
-                        className="w-full bg-muted/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                        className={inputClass}
                       />
                     )}
                   </div>
@@ -283,6 +324,68 @@ const Admin = () => {
                 >
                   <Save className="w-4 h-4" />
                   {saving ? "Saving..." : "Save Settings"}
+                </button>
+              </div>
+            )}
+
+            {/* Content Tab */}
+            {activeTab === "content" && settings && (
+              <div className="max-w-2xl space-y-6">
+                <div className="glass rounded-2xl p-6 space-y-5">
+                  <h3 className="text-xl font-bold text-foreground">Branding & Text</h3>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Brand Name</label>
+                    <input value={settings.brand_name || ""} onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Hero Tagline</label>
+                    <input value={settings.hero_tagline || ""} onChange={(e) => setSettings({ ...settings, hero_tagline: e.target.value })} className={inputClass} placeholder="// developer.init()" />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">About Heading</label>
+                    <input value={settings.about_heading || ""} onChange={(e) => setSettings({ ...settings, about_heading: e.target.value })} className={inputClass} placeholder="Who Am I?" />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Contact Intro</label>
+                    <textarea value={settings.contact_intro || ""} onChange={(e) => setSettings({ ...settings, contact_intro: e.target.value })} rows={3} className={`${inputClass} resize-none`} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Footer Text</label>
+                    <input value={settings.footer_text || ""} onChange={(e) => setSettings({ ...settings, footer_text: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+
+                {/* About Features */}
+                <div className="glass rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-foreground">About Features</h3>
+                    <button onClick={addFeature} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
+                      <Plus className="w-3 h-3" />
+                      Add
+                    </button>
+                  </div>
+                  {(settings.about_features || []).map((feature, i) => (
+                    <div key={i} className="bg-muted/30 rounded-xl p-4 space-y-3">
+                      <input value={feature.title} onChange={(e) => updateFeature(i, { title: e.target.value })} placeholder="Feature title" className={inputSmClass} />
+                      <input value={feature.desc} onChange={(e) => updateFeature(i, { desc: e.target.value })} placeholder="Feature description" className={inputSmClass} />
+                      <div className="flex justify-end">
+                        <button onClick={() => removeFeature(i)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors">
+                          <Trash2 className="w-3 h-3" />
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={saveSettings}
+                  disabled={saving}
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? "Saving..." : "Save All Content"}
                 </button>
               </div>
             )}
@@ -307,7 +410,7 @@ const Admin = () => {
                         value={skill.name}
                         onChange={(e) => updateSkill(skill.id, { name: e.target.value })}
                         placeholder="Skill name"
-                        className="flex-1 bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all"
+                        className={`flex-1 ${inputSmClass}`}
                       />
                       <input
                         type="number"
@@ -315,7 +418,7 @@ const Admin = () => {
                         max={100}
                         value={skill.level}
                         onChange={(e) => updateSkill(skill.id, { level: parseInt(e.target.value) || 0 })}
-                        className="w-20 bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all"
+                        className={`w-20 ${inputSmClass}`}
                       />
                     </div>
                     <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -323,7 +426,7 @@ const Admin = () => {
                         className="h-full rounded-full transition-all"
                         style={{
                           width: `${skill.level}%`,
-                          background: "linear-gradient(90deg, hsl(190, 95%, 55%), hsl(260, 60%, 55%))",
+                          background: "linear-gradient(90deg, hsl(160, 70%, 45%), hsl(40, 90%, 55%))",
                         }}
                       />
                     </div>
@@ -367,33 +470,33 @@ const Admin = () => {
                       value={project.title}
                       onChange={(e) => updateProject(project.id, { title: e.target.value })}
                       placeholder="Project title"
-                      className="w-full bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground font-medium focus:outline-none focus:border-primary/50 transition-all"
+                      className={`${inputSmClass} font-medium`}
                     />
                     <textarea
                       value={project.description}
                       onChange={(e) => updateProject(project.id, { description: e.target.value })}
                       placeholder="Description"
                       rows={3}
-                      className="w-full bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all resize-none"
+                      className={`${inputSmClass} resize-none`}
                     />
                     <input
                       value={project.tags.join(", ")}
                       onChange={(e) => updateProject(project.id, { tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) })}
                       placeholder="Tags (comma separated)"
-                      className="w-full bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all"
+                      className={inputSmClass}
                     />
                     <div className="grid grid-cols-2 gap-3">
                       <input
                         value={project.github_url}
                         onChange={(e) => updateProject(project.id, { github_url: e.target.value })}
                         placeholder="GitHub URL"
-                        className="bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all"
+                        className={inputSmClass}
                       />
                       <input
                         value={project.live_url}
                         onChange={(e) => updateProject(project.id, { live_url: e.target.value })}
                         placeholder="Live URL"
-                        className="bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary/50 transition-all"
+                        className={inputSmClass}
                       />
                     </div>
                     <div className="flex gap-2 justify-end">

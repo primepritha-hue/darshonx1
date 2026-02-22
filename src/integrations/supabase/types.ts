@@ -49,9 +49,15 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          about_features: Json
+          about_heading: string
           bio: string | null
+          brand_name: string
+          contact_intro: string
           email: string | null
+          footer_text: string
           github_url: string | null
+          hero_tagline: string
           id: string
           linkedin_url: string | null
           location: string | null
@@ -61,9 +67,15 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          about_features?: Json
+          about_heading?: string
           bio?: string | null
+          brand_name?: string
+          contact_intro?: string
           email?: string | null
+          footer_text?: string
           github_url?: string | null
+          hero_tagline?: string
           id?: string
           linkedin_url?: string | null
           location?: string | null
@@ -73,9 +85,15 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          about_features?: Json
+          about_heading?: string
           bio?: string | null
+          brand_name?: string
+          contact_intro?: string
           email?: string | null
+          footer_text?: string
           github_url?: string | null
+          hero_tagline?: string
           id?: string
           linkedin_url?: string | null
           location?: string | null
