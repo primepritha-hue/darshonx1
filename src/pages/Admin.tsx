@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import StarField from "@/components/StarField";
-import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft, Layout, Wrench, Upload, Download, Eye, EyeOff } from "lucide-react";
+import { Terminal, LogOut, Settings, Code2, FolderOpen, Save, Plus, Trash2, ArrowLeft, Layout, Wrench, Upload, Download, Eye, EyeOff, Link, User } from "lucide-react";
 import { toast } from "sonner";
 
 type AboutFeature = { title: string; desc: string };
@@ -28,6 +28,20 @@ type SiteSettings = {
   general_chat_daily_limit: number;
   chatbot_name: string;
   chatbot_api_provider: string;
+  discord_username: string;
+  discord_avatar_url: string;
+  discord_status: string;
+  discord_badges: string[];
+  show_discord_profile: boolean;
+};
+
+type SocialLink = {
+  id: string;
+  name: string;
+  url: string;
+  icon: string;
+  sort_order: number;
+  is_active: boolean;
 };
 
 type Skill = {
@@ -65,7 +79,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools" | "social">("settings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -73,6 +87,7 @@ const Admin = () => {
   const [saving, setSaving] = useState(false);
   const [tools, setTools] = useState<Tool[]>([]);
   const [uploadingToolId, setUploadingToolId] = useState<string | null>(null);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
   useEffect(() => {
     checkAuth();
@@ -103,17 +118,19 @@ const Admin = () => {
   };
 
   const loadData = async () => {
-    const [settingsRes, skillsRes, projectsRes, toolsRes] = await Promise.all([
+    const [settingsRes, skillsRes, projectsRes, toolsRes, socialRes] = await Promise.all([
       supabase.from("site_settings").select("*").limit(1).single(),
       supabase.from("skills").select("*").order("sort_order"),
       supabase.from("projects").select("*").order("sort_order"),
       supabase.from("tools").select("*").order("sort_order"),
+      supabase.from("social_links").select("*").order("sort_order"),
     ]);
 
     if (settingsRes.data) setSettings(settingsRes.data as unknown as SiteSettings);
     if (skillsRes.data) setSkills(skillsRes.data as Skill[]);
     if (projectsRes.data) setProjects(projectsRes.data as Project[]);
     if (toolsRes.data) setTools(toolsRes.data as unknown as Tool[]);
+    if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[]);
   };
 
   const handleLogout = async () => {
@@ -145,7 +162,12 @@ const Admin = () => {
         general_chat_daily_limit: settings.general_chat_daily_limit,
         chatbot_name: settings.chatbot_name,
         chatbot_api_provider: settings.chatbot_api_provider,
-      })
+        discord_username: settings.discord_username,
+        discord_avatar_url: settings.discord_avatar_url,
+        discord_status: settings.discord_status,
+        discord_badges: settings.discord_badges || [],
+        show_discord_profile: settings.show_discord_profile,
+      } as any)
       .eq("id", settings.id);
 
     if (error) toast.error(error.message);
@@ -307,6 +329,38 @@ const Admin = () => {
     setUploadingToolId(null);
   };
 
+  // ── Social Links CRUD ──
+  const addSocialLink = async () => {
+    const { data, error } = await supabase
+      .from("social_links")
+      .insert({ name: "New Link", url: "https://", icon: "link", sort_order: socialLinks.length })
+      .select()
+      .single();
+    if (error) toast.error(error.message);
+    else if (data) setSocialLinks([...socialLinks, data as SocialLink]);
+  };
+
+  const updateSocialLink = (id: string, updates: Partial<SocialLink>) => {
+    setSocialLinks(socialLinks.map((l) => (l.id === id ? { ...l, ...updates } : l)));
+  };
+
+  const saveSocialLink = async (link: SocialLink) => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("social_links")
+      .update({ name: link.name, url: link.url, icon: link.icon, sort_order: link.sort_order, is_active: link.is_active })
+      .eq("id", link.id);
+    if (error) toast.error(error.message);
+    else toast.success("Link saved!");
+    setSaving(false);
+  };
+
+  const deleteSocialLink = async (id: string) => {
+    const { error } = await supabase.from("social_links").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else setSocialLinks(socialLinks.filter((l) => l.id !== id));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -327,6 +381,7 @@ const Admin = () => {
     { key: "skills" as const, label: "Skills", icon: Code2 },
     { key: "projects" as const, label: "Projects", icon: FolderOpen },
     { key: "tools" as const, label: "Tools", icon: Wrench },
+    { key: "social" as const, label: "Social & Profile", icon: Link },
   ];
 
   return (
@@ -736,6 +791,106 @@ const Admin = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Social & Profile Tab */}
+            {activeTab === "social" && (
+              <div className="max-w-2xl space-y-6">
+                {/* Discord Profile Settings */}
+                {settings && (
+                  <div className="glass rounded-2xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold text-foreground">Discord Profile Card</h3>
+                      <button
+                        onClick={() => setSettings({ ...settings, show_discord_profile: !settings.show_discord_profile })}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          settings.show_discord_profile ? "bg-green-500/10 text-green-400" : "bg-muted/30 text-muted-foreground"
+                        }`}
+                      >
+                        {settings.show_discord_profile ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                        {settings.show_discord_profile ? "Visible" : "Hidden"}
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Homepage এ Discord-style profile card দেখাবে।</p>
+
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-1 block">Username</label>
+                      <input value={settings.discord_username || ""} onChange={(e) => setSettings({ ...settings, discord_username: e.target.value })} className={inputClass} placeholder="darshon27" />
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-1 block">Avatar URL</label>
+                      <input value={settings.discord_avatar_url || ""} onChange={(e) => setSettings({ ...settings, discord_avatar_url: e.target.value })} className={inputClass} placeholder="https://..." />
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-1 block">Status</label>
+                      <input value={settings.discord_status || ""} onChange={(e) => setSettings({ ...settings, discord_status: e.target.value })} className={inputClass} placeholder="Love ✕ Chut() ✅" />
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-1 block">Badges (comma separated)</label>
+                      <input
+                        value={(settings.discord_badges || []).join(", ")}
+                        onChange={(e) => setSettings({ ...settings, discord_badges: e.target.value.split(",").map((b) => b.trim()).filter(Boolean) })}
+                        className={inputClass}
+                        placeholder="🔥 বাবা, 🧿, ✅"
+                      />
+                    </div>
+
+                    <button
+                      onClick={saveSettings}
+                      disabled={saving}
+                      className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      {saving ? "Saving..." : "Save Profile"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Social Links */}
+                <div className="glass rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-foreground">Social Links</h3>
+                    <button
+                      onClick={addSocialLink}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Link
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Homepage এ social link icons দেখাবে। Icon names: discord, telegram, spotify, threads, github, instagram, youtube, twitch, x, facebook, linkedin, reddit, steam, tiktok, globe, link, music, mail</p>
+
+                  {socialLinks.map((link) => (
+                    <div key={link.id} className="bg-muted/30 rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-foreground">{link.name}</span>
+                        <button
+                          onClick={() => { updateSocialLink(link.id, { is_active: !link.is_active }); }}
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                            link.is_active ? "bg-green-500/10 text-green-400" : "bg-muted/30 text-muted-foreground"
+                          }`}
+                        >
+                          {link.is_active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <input value={link.name} onChange={(e) => updateSocialLink(link.id, { name: e.target.value })} placeholder="Name" className={inputSmClass} />
+                        <input value={link.icon} onChange={(e) => updateSocialLink(link.id, { icon: e.target.value })} placeholder="Icon" className={inputSmClass} />
+                        <input type="number" value={link.sort_order} onChange={(e) => updateSocialLink(link.id, { sort_order: parseInt(e.target.value) || 0 })} placeholder="Order" className={inputSmClass} />
+                      </div>
+                      <input value={link.url} onChange={(e) => updateSocialLink(link.id, { url: e.target.value })} placeholder="URL" className={inputSmClass} />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => saveSocialLink(link)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors">
+                          <Save className="w-3 h-3" /> Save
+                        </button>
+                        <button onClick={() => deleteSocialLink(link.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors">
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </motion.div>

@@ -78,6 +78,10 @@ export type Database = {
           chatbot_api_provider: string
           chatbot_name: string
           contact_intro: string
+          discord_avatar_url: string | null
+          discord_badges: string[] | null
+          discord_status: string | null
+          discord_username: string | null
           email: string | null
           footer_text: string
           general_chat_daily_limit: number
@@ -88,6 +92,7 @@ export type Database = {
           location: string | null
           name: string
           phone: string | null
+          show_discord_profile: boolean | null
           title: string
           updated_at: string
         }
@@ -100,6 +105,10 @@ export type Database = {
           chatbot_api_provider?: string
           chatbot_name?: string
           contact_intro?: string
+          discord_avatar_url?: string | null
+          discord_badges?: string[] | null
+          discord_status?: string | null
+          discord_username?: string | null
           email?: string | null
           footer_text?: string
           general_chat_daily_limit?: number
@@ -110,6 +119,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          show_discord_profile?: boolean | null
           title?: string
           updated_at?: string
         }
@@ -122,6 +132,10 @@ export type Database = {
           chatbot_api_provider?: string
           chatbot_name?: string
           contact_intro?: string
+          discord_avatar_url?: string | null
+          discord_badges?: string[] | null
+          discord_status?: string | null
+          discord_username?: string | null
           email?: string | null
           footer_text?: string
           general_chat_daily_limit?: number
@@ -132,6 +146,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          show_discord_profile?: boolean | null
           title?: string
           updated_at?: string
         }
@@ -158,6 +173,36 @@ export type Database = {
           level?: number
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      social_links: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          url?: string
         }
         Relationships: []
       }
