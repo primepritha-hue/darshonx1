@@ -2,3 +2,6 @@ project_id = "rntcupvjspmbrkarezmq"
 
 [functions.portfolio-chat]
 verify_jwt = false
+
+[functions.discord-profile]
+verify_jwt = false
