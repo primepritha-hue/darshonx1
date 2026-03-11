@@ -14,25 +14,41 @@ const HeroSection = () => {
       <ParticleBurst />
 
       <div className="container mx-auto px-6 text-center relative z-10">
-        {/* Profile Image */}
-        {(settings as any)?.profile_image_url && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-8 flex justify-center"
-          >
-            <div className="relative group">
-              <div className="absolute -inset-1 rounded-full opacity-60 blur-md group-hover:opacity-100 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-pink)), hsl(var(--neon-gold)))" }} />
+        {/* Profile Avatar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-8 flex justify-center"
+        >
+          <div className="relative group">
+            {/* Neon glow ring */}
+            <div
+              className="absolute -inset-[3px] rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"
+              style={{ background: "hsl(var(--primary))" }}
+            />
+            <div
+              className="absolute -inset-[3px] rounded-full opacity-90"
+              style={{ background: "hsl(var(--primary))", boxShadow: "0 0 25px hsl(var(--primary) / 0.6), 0 0 50px hsl(var(--primary) / 0.3), inset 0 0 25px hsl(var(--primary) / 0.1)" }}
+            />
+            {(settings as any)?.profile_image_url ? (
               <img
                 src={(settings as any).profile_image_url}
                 alt={settings?.name || "Profile"}
-                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-2"
-                style={{ borderColor: "hsl(var(--primary) / 0.4)" }}
+                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover"
               />
-            </div>
-          </motion.div>
-        )}
+            ) : (
+              <div
+                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full flex items-center justify-center"
+                style={{ background: "hsl(var(--background))" }}
+              >
+                <span className="text-xl md:text-2xl font-bold text-muted-foreground">
+                  {settings?.name || "?"}
+                </span>
+              </div>
+            )}
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
