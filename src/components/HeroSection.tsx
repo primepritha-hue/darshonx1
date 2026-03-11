@@ -1,9 +1,34 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, Github, Linkedin, Mail } from "lucide-react";
+import { ChevronDown, Github, Linkedin, Mail, Globe, Music, Link as LinkIcon, Send } from "lucide-react";
+import { FaDiscord, FaTelegram, FaSpotify, FaThreads, FaInstagram, FaYoutube, FaTwitch, FaXTwitter, FaFacebook, FaReddit, FaSteam, FaTiktok } from "react-icons/fa6";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import ParticleBurst from "./ParticleBurst";
 import TypingEffect from "./TypingEffect";
+
+const iconMap: Record<string, React.ElementType> = {
+  discord: FaDiscord,
+  telegram: FaTelegram,
+  spotify: FaSpotify,
+  threads: FaThreads,
+  github: Github,
+  instagram: FaInstagram,
+  youtube: FaYoutube,
+  twitch: FaTwitch,
+  x: FaXTwitter,
+  facebook: FaFacebook,
+  linkedin: Linkedin,
+  reddit: FaReddit,
+  steam: FaSteam,
+  tiktok: FaTiktok,
+  globe: Globe,
+  link: LinkIcon,
+  music: Music,
+  mail: Mail,
+  send: Send,
+};
 
 const HeroSection = () => {
   const { data: settings } = useSiteSettings();
