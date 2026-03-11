@@ -404,6 +404,7 @@ const Admin = () => {
     else setSkillTags(skillTags.filter((t) => t.id !== id));
   };
 
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <StarField />
