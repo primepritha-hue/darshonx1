@@ -51,14 +51,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        galaxy: {
-          deep: "hsl(var(--galaxy-deep))",
-          void: "hsl(var(--galaxy-void))",
-          emerald: "hsl(var(--galaxy-emerald))",
-          gold: "hsl(var(--galaxy-gold))",
-          magenta: "hsl(var(--galaxy-magenta))",
-          teal: "hsl(var(--galaxy-teal))",
-          star: "hsl(var(--galaxy-star))",
+        neon: {
+          cyan: "hsl(var(--neon-cyan))",
+          emerald: "hsl(var(--neon-emerald))",
+          pink: "hsl(var(--neon-pink))",
+          gold: "hsl(var(--neon-gold))",
+          sky: "hsl(var(--neon-sky))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

@@ -6,56 +6,51 @@
 
 @layer base {
   :root {
-    --background: 240 20% 4%;
-    --foreground: 45 20% 90%;
+    --background: 0 0% 2%;
+    --foreground: 0 0% 92%;
 
-    --card: 240 15% 7%;
-    --card-foreground: 45 20% 90%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 92%;
 
-    --popover: 240 15% 7%;
-    --popover-foreground: 45 20% 90%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 92%;
 
-    --primary: 160 70% 45%;
-    --primary-foreground: 240 20% 4%;
+    --primary: 170 85% 50%;
+    --primary-foreground: 0 0% 2%;
 
-    --secondary: 40 90% 55%;
-    --secondary-foreground: 240 20% 4%;
+    --secondary: 330 75% 55%;
+    --secondary-foreground: 0 0% 2%;
 
-    --muted: 240 12% 12%;
-    --muted-foreground: 220 15% 50%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 330 75% 55%;
-    --accent-foreground: 45 20% 95%;
+    --accent: 40 90% 55%;
+    --accent-foreground: 0 0% 2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 12% 14%;
-    --input: 240 12% 14%;
-    --ring: 160 70% 45%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 170 85% 50%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Galaxy unique tokens */
-    --galaxy-deep: 250 30% 3%;
-    --galaxy-void: 260 25% 6%;
-    --galaxy-emerald: 160 70% 45%;
-    --galaxy-gold: 40 90% 55%;
-    --galaxy-magenta: 330 75% 55%;
-    --galaxy-teal: 175 65% 40%;
-    --galaxy-star: 45 100% 90%;
-    --galaxy-nebula-1: 160 60% 25%;
-    --galaxy-nebula-2: 330 50% 25%;
-    --galaxy-nebula-3: 40 60% 20%;
+    /* Neon tokens */
+    --neon-cyan: 170 85% 50%;
+    --neon-emerald: 160 70% 45%;
+    --neon-pink: 330 75% 55%;
+    --neon-gold: 40 90% 55%;
+    --neon-sky: 200 85% 55%;
 
-    --sidebar-background: 240 15% 7%;
-    --sidebar-foreground: 45 20% 90%;
-    --sidebar-primary: 160 70% 45%;
-    --sidebar-primary-foreground: 240 20% 4%;
-    --sidebar-accent: 240 12% 12%;
-    --sidebar-accent-foreground: 45 20% 90%;
-    --sidebar-border: 240 12% 14%;
-    --sidebar-ring: 160 70% 45%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-primary: 170 85% 50%;
+    --sidebar-primary-foreground: 0 0% 2%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 170 85% 50%;
   }
 }
 
@@ -80,71 +75,102 @@
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.15);
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.2);
   }
 
   .text-glow-strong {
-    text-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 80px hsl(var(--primary) / 0.3), 0 0 120px hsl(var(--primary) / 0.1);
+    text-shadow: 0 0 30px hsl(var(--primary) / 0.7), 0 0 80px hsl(var(--primary) / 0.35), 0 0 120px hsl(var(--primary) / 0.15);
   }
 
   .text-glow-gold {
-    text-shadow: 0 0 25px hsl(var(--galaxy-gold) / 0.5), 0 0 60px hsl(var(--galaxy-gold) / 0.2);
+    text-shadow: 0 0 25px hsl(var(--neon-gold) / 0.6), 0 0 60px hsl(var(--neon-gold) / 0.25);
+  }
+
+  .text-glow-pink {
+    text-shadow: 0 0 25px hsl(var(--neon-pink) / 0.6), 0 0 60px hsl(var(--neon-pink) / 0.25);
   }
 
   .box-glow {
-    box-shadow: 0 0 15px hsl(var(--primary) / 0.12), 0 0 30px hsl(var(--primary) / 0.04);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.15), 0 0 40px hsl(var(--primary) / 0.06);
   }
 
   .box-glow-strong {
-    box-shadow: 0 0 25px hsl(var(--primary) / 0.25), 0 0 60px hsl(var(--primary) / 0.08);
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.1);
+  }
+
+  .box-glow-pink {
+    box-shadow: 0 0 30px hsl(var(--neon-pink) / 0.25), 0 0 60px hsl(var(--neon-pink) / 0.08);
   }
 
   .gradient-text {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--galaxy-emerald)), hsl(var(--galaxy-gold)), hsl(var(--galaxy-magenta)));
+    background-image: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-pink)), hsl(var(--neon-gold)));
     background-size: 200% 200%;
     animation: gradient-shift 6s ease infinite;
   }
 
   .gradient-text-subtle {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(90deg, hsl(var(--galaxy-emerald)), hsl(var(--galaxy-teal)));
+    background-image: linear-gradient(90deg, hsl(var(--neon-cyan)), hsl(var(--neon-emerald)));
   }
 
   .glass {
     @apply backdrop-blur-xl;
-    background: linear-gradient(135deg, hsl(var(--card) / 0.6), hsl(var(--galaxy-void) / 0.4));
+    background: hsl(var(--card) / 0.5);
     border: 1px solid hsl(var(--border) / 0.5);
   }
 
   .glass-strong {
     @apply backdrop-blur-2xl;
-    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--galaxy-void) / 0.6));
+    background: hsl(var(--card) / 0.7);
     border: 1px solid hsl(var(--border) / 0.7);
   }
 
-  .nebula-bg {
-    background: 
-      radial-gradient(ellipse at 15% 50%, hsl(var(--galaxy-nebula-1) / 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 20%, hsl(var(--galaxy-nebula-2) / 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 85%, hsl(var(--galaxy-nebula-3) / 0.06) 0%, transparent 50%);
+  .neon-card {
+    @apply backdrop-blur-xl rounded-3xl;
+    background: hsl(var(--card) / 0.35);
+    border: 1px solid hsl(var(--border) / 0.4);
+    transition: all 0.4s ease;
+  }
+
+  .neon-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.15);
   }
 
   .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(var(--galaxy-gold) / 0.2), transparent);
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), hsl(var(--neon-pink) / 0.3), transparent);
   }
 
   .tag-glow {
-    background: hsl(var(--primary) / 0.06);
-    border: 1px solid hsl(var(--primary) / 0.15);
+    background: hsl(var(--primary) / 0.08);
+    border: 1px solid hsl(var(--primary) / 0.2);
     transition: all 0.3s ease;
   }
 
   .tag-glow:hover {
-    background: hsl(var(--primary) / 0.12);
-    border-color: hsl(var(--primary) / 0.3);
-    box-shadow: 0 0 10px hsl(var(--primary) / 0.1);
+    background: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.15);
+  }
+
+  .nebula-bg {
+    background: 
+      radial-gradient(ellipse at 15% 50%, hsl(var(--neon-cyan) / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, hsl(var(--neon-pink) / 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 85%, hsl(var(--neon-gold) / 0.04) 0%, transparent 50%);
+  }
+
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 100;
+    background: linear-gradient(90deg, hsl(var(--neon-cyan)), hsl(var(--neon-pink)), hsl(var(--neon-gold)));
+    transform-origin: 0%;
   }
 }
 
@@ -166,7 +192,7 @@
 
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.2); }
-  50% { box-shadow: 0 0 25px hsl(var(--primary) / 0.4), 0 0 50px hsl(var(--primary) / 0.1); }
+  50% { box-shadow: 0 0 25px hsl(var(--primary) / 0.5), 0 0 50px hsl(var(--primary) / 0.15); }
 }
 
 @keyframes aurora {
@@ -181,9 +207,16 @@
   50% { opacity: 0; }
 }
 
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -50px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(50px, 30px) scale(1.05); }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: hsl(var(--background));
@@ -193,11 +226,11 @@
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.4);
+  background: hsl(var(--primary) / 0.5);
 }
 
 /* Selection */
 ::selection {
-  background: hsl(var(--primary) / 0.25);
+  background: hsl(var(--primary) / 0.3);
   color: hsl(var(--foreground));
 }

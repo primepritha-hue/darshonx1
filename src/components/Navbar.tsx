@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Terminal, Wrench } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,9 +14,16 @@ const navItems = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { data: settings } = useSiteSettings();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const scrollTo = (href: string) => {
     setIsOpen(false);
@@ -37,7 +44,12 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 glass-strong"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        background: scrolled ? "hsl(var(--card) / 0.85)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "1px solid hsl(var(--border) / 0.4)" : "none",
+      }}
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <button onClick={() => scrollTo("#home")} className="flex items-center gap-2 group">
@@ -77,7 +89,8 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border/30"
+            className="md:hidden"
+            style={{ borderTop: "1px solid hsl(var(--border) / 0.3)", background: "hsl(var(--card) / 0.9)", backdropFilter: "blur(20px)" }}
           >
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
               {navItems.map((item) => (

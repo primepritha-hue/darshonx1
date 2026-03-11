@@ -6,7 +6,7 @@ const Footer = () => {
   const { data: settings } = useSiteSettings();
 
   return (
-    <footer className="relative z-10 py-8">
+    <footer className="relative z-10 py-10">
       <ScrollReveal blur>
         <div className="section-divider max-w-xl mx-auto mb-8" />
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">

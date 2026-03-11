@@ -9,7 +9,7 @@ const iconMap: Record<number, typeof Code2> = {
   2: Sparkles,
 };
 
-const glowMap = ["160, 70%, 45%", "40, 90%, 55%", "330, 75%, 55%"];
+const glowMap = ["170, 85%, 50%", "40, 90%, 55%", "330, 75%, 55%"];
 
 const AboutSection = () => {
   const { data: settings } = useSiteSettings();
@@ -54,9 +54,11 @@ const AboutSection = () => {
                 <ScrollReveal key={i} direction="right" delay={0.2 + i * 0.12} scale>
                   <AuraGlow
                     glowColor={glowMap[i % glowMap.length]}
-                    className="glass rounded-xl p-5 flex items-start gap-4 transition-all duration-300 group cursor-default"
+                    className="neon-card p-5 flex items-start gap-4 group cursor-default"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors duration-300">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-300"
+                      style={{ background: "hsl(var(--primary) / 0.08)" }}
+                    >
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
