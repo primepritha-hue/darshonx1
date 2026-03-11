@@ -978,6 +978,64 @@ const Admin = () => {
                 </div>
               </div>
             )}
+
+            {/* Skill Tags Tab */}
+            {activeTab === "skilltags" && (
+              <div className="max-w-2xl space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-foreground">Skill Tags (Hero Section)</h3>
+                  <button
+                    onClick={addSkillTag}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Tag
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Hero section এর নিচে grid আকারে দেখাবে। Emoji সহ label লিখুন (যেমন: 🌐 ওয়েব ডেভেলপার)</p>
+                {skillTags.map((tag) => (
+                  <div key={tag.id} className="glass rounded-xl p-4 space-y-3">
+                    <div className="flex gap-3 items-center">
+                      <input
+                        value={tag.label}
+                        onChange={(e) => updateSkillTag(tag.id, { label: e.target.value })}
+                        placeholder="🌐 Skill Tag"
+                        className={`flex-1 ${inputSmClass}`}
+                      />
+                      <input
+                        type="number"
+                        value={tag.sort_order}
+                        onChange={(e) => updateSkillTag(tag.id, { sort_order: parseInt(e.target.value) || 0 })}
+                        className={`w-20 ${inputSmClass}`}
+                        placeholder="Order"
+                      />
+                      <button
+                        onClick={() => updateSkillTag(tag.id, { is_active: !tag.is_active })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          tag.is_active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {tag.is_active ? "Active" : "Hidden"}
+                      </button>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => saveSkillTag(tag)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                      >
+                        <Save className="w-3 h-3" /> Save
+                      </button>
+                      <button
+                        onClick={() => deleteSkillTag(tag.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" /> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
