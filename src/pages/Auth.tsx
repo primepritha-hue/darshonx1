@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Terminal, LogIn, Eye, EyeOff } from "lucide-react";
 import StarField from "@/components/StarField";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const Auth = () => {
+  const { data: siteSettings } = useSiteSettings();
+  const brandName = siteSettings?.brand_name || "Dev.folio";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +41,7 @@ const Auth = () => {
         <div className="glass rounded-2xl p-8">
           <div className="flex items-center justify-center gap-2 mb-8">
             <Terminal className="w-6 h-6 text-primary" />
-            <span className="text-2xl font-bold gradient-text">Dev.folio</span>
+            <span className="text-2xl font-bold gradient-text">{brandName}</span>
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">
