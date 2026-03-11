@@ -55,13 +55,13 @@ const ProjectsSection = () => {
   const { data: projects } = useProjects();
 
   return (
-    <section id="projects" className="relative py-32">
+    <section id="projects" className="relative py-16">
       <ScrollReveal scale blur>
-        <div className="section-divider max-w-xl mx-auto mb-32" />
+        <div className="section-divider max-w-xl mx-auto mb-16" />
       </ScrollReveal>
       <div className="container mx-auto px-6">
         <ScrollReveal scale blur>
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <p className="text-primary font-mono text-xs mb-3 tracking-[0.2em] uppercase">03 — Projects</p>
             <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Featured <span className="gradient-text">Work</span>
