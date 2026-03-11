@@ -127,12 +127,13 @@ const Admin = () => {
   };
 
   const loadData = async () => {
-    const [settingsRes, skillsRes, projectsRes, toolsRes, socialRes] = await Promise.all([
+    const [settingsRes, skillsRes, projectsRes, toolsRes, socialRes, skillTagsRes] = await Promise.all([
       supabase.from("site_settings").select("*").limit(1).single(),
       supabase.from("skills").select("*").order("sort_order"),
       supabase.from("projects").select("*").order("sort_order"),
       supabase.from("tools").select("*").order("sort_order"),
       supabase.from("social_links").select("*").order("sort_order"),
+      supabase.from("skill_tags" as any).select("*").order("sort_order"),
     ]);
 
     if (settingsRes.data) setSettings(settingsRes.data as unknown as SiteSettings);
@@ -140,6 +141,7 @@ const Admin = () => {
     if (projectsRes.data) setProjects(projectsRes.data as Project[]);
     if (toolsRes.data) setTools(toolsRes.data as unknown as Tool[]);
     if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[]);
+    if (skillTagsRes.data) setSkillTags(skillTagsRes.data as unknown as SkillTag[]);
   };
 
   const handleLogout = async () => {
