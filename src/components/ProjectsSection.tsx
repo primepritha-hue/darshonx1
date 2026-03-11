@@ -4,10 +4,10 @@ import AuraGlow from "@/components/AuraGlow";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const glowColors = [
-  "160, 70%, 45%",
+  "170, 85%, 50%",
   "40, 90%, 55%",
   "330, 75%, 55%",
-  "175, 65%, 40%",
+  "200, 85%, 55%",
 ];
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => (
@@ -19,7 +19,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   >
     <AuraGlow
       glowColor={glowColors[index % glowColors.length]}
-      className="glass rounded-2xl p-6 group transition-all duration-500 flex flex-col h-full cursor-default"
+      className="neon-card p-6 group flex flex-col h-full cursor-default"
     >
       <div className="flex items-center justify-between mb-4">
         <Folder className="w-9 h-9 text-primary/70" />

@@ -31,26 +31,11 @@ type DiscordProfile = {
 };
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  discord: SiDiscord,
-  telegram: SiTelegram,
-  spotify: SiSpotify,
-  threads: SiThreads,
-  github: SiGithub,
-  instagram: SiInstagram,
-  youtube: SiYoutube,
-  twitch: SiTwitch,
-  x: SiX,
-  twitter: SiX,
-  facebook: SiFacebook,
-  linkedin: SiLinkedin,
-  reddit: SiReddit,
-  steam: SiSteam,
-  tiktok: SiTiktok,
-  globe: HiGlobeAlt,
-  link: HiLink,
-  music: HiMusicalNote,
-  send: SiTelegram,
-  mail: HiEnvelope,
+  discord: SiDiscord, telegram: SiTelegram, spotify: SiSpotify, threads: SiThreads,
+  github: SiGithub, instagram: SiInstagram, youtube: SiYoutube, twitch: SiTwitch,
+  x: SiX, twitter: SiX, facebook: SiFacebook, linkedin: SiLinkedin, reddit: SiReddit,
+  steam: SiSteam, tiktok: SiTiktok, globe: HiGlobeAlt, link: HiLink, music: HiMusicalNote,
+  send: SiTelegram, mail: HiEnvelope,
 };
 
 const useSocialLinks = () =>
@@ -58,10 +43,7 @@ const useSocialLinks = () =>
     queryKey: ["social_links"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("social_links")
-        .select("*")
-        .eq("is_active", true)
-        .order("sort_order");
+        .from("social_links").select("*").eq("is_active", true).order("sort_order");
       if (error) throw error;
       return data as SocialLink[];
     },
@@ -75,7 +57,7 @@ const useDiscordProfile = () =>
       if (error) throw error;
       return data as DiscordProfile;
     },
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+    refetchInterval: 5 * 60 * 1000,
     staleTime: 2 * 60 * 1000,
   });
 
@@ -88,7 +70,6 @@ const ProfileSection = () => {
   const showDiscord = discordSettings?.show_discord_profile !== false;
   const profileImageUrl = discordSettings?.profile_image_url;
 
-  // Use live Discord data if available, fallback to admin settings
   const displayName = discordProfile?.global_name || settings?.name || "Username";
   const username = discordProfile?.username || discordSettings?.discord_username;
   const avatarUrl = profileImageUrl || discordProfile?.avatar_url || discordSettings?.discord_avatar_url;
@@ -97,7 +78,6 @@ const ProfileSection = () => {
   const badges = discordProfile?.badges?.length ? discordProfile.badges : (discordSettings?.discord_badges || []);
   const status = discordSettings?.discord_status;
 
-  // Convert accent_color int to hex
   const accentHex = discordProfile?.accent_color
     ? `#${discordProfile.accent_color.toString(16).padStart(6, "0")}`
     : null;
@@ -111,9 +91,7 @@ const ProfileSection = () => {
       <div className="container mx-auto px-6">
         <ScrollReveal scale blur>
           <div className="text-center mb-12">
-            <p className="text-primary font-mono text-xs mb-3 tracking-[0.2em] uppercase">
-              05 — Connect
-            </p>
+            <p className="text-primary font-mono text-xs mb-3 tracking-[0.2em] uppercase">05 — Connect</p>
             <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Find <span className="gradient-text">Me</span>
             </h2>
@@ -121,14 +99,9 @@ const ProfileSection = () => {
         </ScrollReveal>
 
         <div className="max-w-lg mx-auto">
-          {/* Discord-style Profile Card */}
           {showDiscord && (
             <ScrollReveal scale blur delay={0.1}>
-              <AuraGlow
-                glowColor="330, 75%, 55%"
-                className="glass-strong rounded-2xl overflow-hidden mb-8"
-              >
-                {/* Banner */}
+              <AuraGlow glowColor="330, 75%, 55%" className="neon-card overflow-hidden mb-8">
                 <div
                   className="h-28 relative"
                   style={{
@@ -138,12 +111,11 @@ const ProfileSection = () => {
                         ? bannerColor
                         : accentHex
                           ? `linear-gradient(135deg, ${accentHex}, hsl(var(--primary) / 0.4))`
-                          : "linear-gradient(135deg, hsl(var(--accent) / 0.6), hsl(var(--primary) / 0.4), hsl(var(--secondary) / 0.3))",
+                          : "linear-gradient(135deg, hsl(var(--neon-pink) / 0.6), hsl(var(--primary) / 0.4), hsl(var(--neon-gold) / 0.3))",
                   }}
                 />
 
                 <div className="px-5 pb-5">
-                  {/* Avatar */}
                   <div className="relative -mt-12 mb-3">
                     {avatarUrl ? (
                       <img
@@ -160,30 +132,21 @@ const ProfileSection = () => {
                         {displayName?.[0] || "?"}
                       </div>
                     )}
-                    {/* Online indicator */}
                     <div
                       className="absolute bottom-0 right-0 w-5 h-5 rounded-full border-[3px]"
-                      style={{
-                        borderColor: "hsl(var(--card))",
-                        background: "hsl(160, 70%, 45%)",
-                      }}
+                      style={{ borderColor: "hsl(var(--card))", background: "hsl(var(--neon-emerald))" }}
                     />
                   </div>
 
-                  {/* Name & username */}
                   <h3 className="text-lg font-bold text-foreground">{displayName}</h3>
-                  {username && (
-                    <p className="text-sm text-muted-foreground font-mono">@{username}</p>
-                  )}
+                  {username && <p className="text-sm text-muted-foreground font-mono">@{username}</p>}
 
-                  {/* Status */}
                   {status && (
-                    <div className="mt-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                    <div className="mt-2 text-sm text-muted-foreground rounded-xl px-3 py-2" style={{ background: "hsl(var(--muted) / 0.3)" }}>
                       {status}
                     </div>
                   )}
 
-                  {/* Location */}
                   {settings?.location && (
                     <div className="flex items-center gap-1.5 mt-3 text-xs text-muted-foreground">
                       <MapPin className="w-3 h-3" />
@@ -191,18 +154,12 @@ const ProfileSection = () => {
                     </div>
                   )}
 
-                  {/* Badges */}
                   {badges.length > 0 && (
                     <div className="flex gap-1.5 mt-3 flex-wrap">
                       {badges.map((badge: string, i: number) => (
                         <span
                           key={i}
-                          className="text-xs px-2 py-0.5 rounded-full font-medium"
-                          style={{
-                            background: "hsl(var(--primary) / 0.1)",
-                            color: "hsl(var(--primary))",
-                            border: "1px solid hsl(var(--primary) / 0.2)",
-                          }}
+                          className="text-xs px-2 py-0.5 rounded-full font-medium tag-glow text-primary"
                         >
                           {badge}
                         </span>
@@ -214,7 +171,6 @@ const ProfileSection = () => {
             </ScrollReveal>
           )}
 
-          {/* Social Links Grid */}
           {socialLinks && socialLinks.length > 0 && (
             <ScrollReveal scale blur delay={0.2}>
               <div className="flex flex-wrap justify-center gap-4">
@@ -226,7 +182,7 @@ const ProfileSection = () => {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group relative w-14 h-14 rounded-2xl glass flex items-center justify-center text-muted-foreground hover:text-foreground hover:box-glow-strong transition-all duration-500"
+                      className="group relative w-14 h-14 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary hover:box-glow-strong transition-all duration-500"
                       title={link.name}
                     >
                       <IconComponent className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />

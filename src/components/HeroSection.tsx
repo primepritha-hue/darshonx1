@@ -12,36 +12,6 @@ const HeroSection = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <ParticleBurst />
-      {/* Aurora blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute w-[600px] h-[600px] rounded-full blur-[120px] opacity-[0.04]"
-          style={{
-            top: "10%",
-            left: "20%",
-            background: "hsl(160, 70%, 45%)",
-            animation: "aurora 20s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute w-[500px] h-[500px] rounded-full blur-[100px] opacity-[0.03]"
-          style={{
-            top: "30%",
-            right: "15%",
-            background: "hsl(330, 75%, 55%)",
-            animation: "aurora 25s ease-in-out infinite reverse",
-          }}
-        />
-        <div
-          className="absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-[0.03]"
-          style={{
-            bottom: "20%",
-            left: "40%",
-            background: "hsl(40, 90%, 55%)",
-            animation: "aurora 18s ease-in-out infinite",
-          }}
-        />
-      </div>
 
       <div className="container mx-auto px-6 text-center relative z-10">
         <motion.div
@@ -49,7 +19,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <p className="font-mono text-sm md:text-base mb-6 tracking-[0.3em] uppercase text-glow-gold" style={{ color: "hsl(40, 90%, 55%)" }}>
+          <p className="font-mono text-sm md:text-base mb-6 tracking-[0.3em] uppercase text-glow-gold" style={{ color: "hsl(var(--neon-gold))" }}>
             <TypingEffect text={settings?.hero_tagline || "// developer.init()"} speed={60} delay={500} />
           </p>
         </motion.div>
@@ -77,11 +47,11 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.7 }}
           className="flex items-center justify-center gap-3 mb-10"
         >
-          <div className="h-[1px] w-12 bg-primary/40" />
+          <div className="h-[1px] w-12" style={{ background: "hsl(var(--primary) / 0.4)" }} />
           <p className="text-lg md:text-xl text-muted-foreground font-light tracking-wide">
             {settings?.title || "Full-Stack Developer"}
           </p>
-          <div className="h-[1px] w-12 bg-primary/40" />
+          <div className="h-[1px] w-12" style={{ background: "hsl(var(--primary) / 0.4)" }} />
         </motion.div>
 
         <motion.div
@@ -98,9 +68,9 @@ const HeroSection = () => {
             <a
               key={i}
               href={href}
-              className="w-11 h-11 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-primary hover:box-glow-strong transition-all duration-500 group"
+              className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group"
             >
-              <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </a>
           ))}
         </motion.div>

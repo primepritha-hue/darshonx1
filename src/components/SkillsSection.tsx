@@ -12,16 +12,17 @@ const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: 
     <div ref={ref} className="group">
       <div className="flex justify-between mb-2">
         <span className="text-foreground font-medium text-sm">{name}</span>
-        <span className="text-secondary font-mono text-xs">{level}%</span>
+        <span className="text-primary font-mono text-xs">{level}%</span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
+      <div className="h-2 rounded-full overflow-hidden" style={{ background: "hsl(var(--muted) / 0.6)" }}>
         <motion.div
           initial={{ width: 0 }}
           animate={isInView ? { width: `${level}%` } : {}}
           transition={{ duration: 1.2, delay, ease: "easeOut" }}
           className="h-full rounded-full"
           style={{
-            background: `linear-gradient(90deg, hsl(160, 70%, 45%), hsl(40, 90%, 55%))`,
+            background: `linear-gradient(90deg, hsl(var(--neon-cyan)), hsl(var(--neon-pink)))`,
+            boxShadow: "0 0 12px hsl(var(--primary) / 0.4)",
           }}
         />
       </div>
@@ -48,7 +49,7 @@ const SkillsSection = () => {
         </ScrollReveal>
 
         <ScrollReveal scale blur delay={0.2}>
-          <AuraGlow className="max-w-2xl mx-auto glass rounded-2xl p-8" glowSize={300} glowColor="160, 70%, 45%">
+          <AuraGlow className="max-w-2xl mx-auto neon-card p-8" glowSize={300} glowColor="170, 85%, 50%">
             <div className="space-y-5">
               {(skills || []).map((skill, i) => (
                 <SkillBar key={skill.id} name={skill.name} level={skill.level} delay={i * 0.08} />
