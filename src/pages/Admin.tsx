@@ -86,7 +86,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools" | "social">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools" | "social" | "skilltags">("settings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
