@@ -4,6 +4,7 @@ import StarField from "@/components/StarField";
 import CursorAura from "@/components/CursorAura";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import SkillTagsSection from "@/components/SkillTagsSection";
 import AboutSection from "@/components/AboutSection";
 import SkillsSection from "@/components/SkillsSection";
 import ProjectsSection from "@/components/ProjectsSection";
