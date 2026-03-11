@@ -420,6 +420,7 @@ const Admin = () => {
   const tabs = [
     { key: "settings" as const, label: "Site Info", icon: Settings },
     { key: "content" as const, label: "Content", icon: Layout },
+    { key: "skilltags" as const, label: "Skill Tags", icon: User },
     { key: "skills" as const, label: "Skills", icon: Code2 },
     { key: "projects" as const, label: "Projects", icon: FolderOpen },
     { key: "tools" as const, label: "Tools", icon: Wrench },
