@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Terminal, LogIn, Eye, EyeOff } from "lucide-react";
 import StarField from "@/components/StarField";
+import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
