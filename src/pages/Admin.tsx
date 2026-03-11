@@ -96,6 +96,7 @@ const Admin = () => {
   const [uploadingToolId, setUploadingToolId] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+  const [skillTags, setSkillTags] = useState<SkillTag[]>([]);
 
   useEffect(() => {
     checkAuth();
