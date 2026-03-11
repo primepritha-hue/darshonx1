@@ -7,6 +7,8 @@ import StarField from "@/components/StarField";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
 
 const Auth = () => {
+  const { data: siteSettings } = useSiteSettings();
+  const brandName = siteSettings?.brand_name || "Dev.folio";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
