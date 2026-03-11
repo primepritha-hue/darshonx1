@@ -372,7 +372,38 @@ const Admin = () => {
     else setSocialLinks(socialLinks.filter((l) => l.id !== id));
   };
 
-  if (loading) {
+  // ── Skill Tags CRUD ──
+  const addSkillTag = async () => {
+    const { data, error } = await supabase
+      .from("skill_tags" as any)
+      .insert({ label: "🆕 New Tag", sort_order: skillTags.length } as any)
+      .select()
+      .single();
+    if (error) toast.error(error.message);
+    else if (data) setSkillTags([...skillTags, data as unknown as SkillTag]);
+  };
+
+  const updateSkillTag = (id: string, updates: Partial<SkillTag>) => {
+    setSkillTags(skillTags.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  };
+
+  const saveSkillTag = async (tag: SkillTag) => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("skill_tags" as any)
+      .update({ label: tag.label, sort_order: tag.sort_order, is_active: tag.is_active } as any)
+      .eq("id", tag.id);
+    if (error) toast.error(error.message);
+    else toast.success("Tag saved!");
+    setSaving(false);
+  };
+
+  const deleteSkillTag = async (id: string) => {
+    const { error } = await supabase.from("skill_tags" as any).delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else setSkillTags(skillTags.filter((t) => t.id !== id));
+  };
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <StarField />
