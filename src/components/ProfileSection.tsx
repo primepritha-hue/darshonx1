@@ -51,9 +51,9 @@ const ProfileSection = () => {
   const status = s?.discord_status;
 
   return (
-    <section id="profile" className="relative py-24">
+    <section id="profile" className="relative py-16">
       <ScrollReveal scale blur>
-        <div className="section-divider max-w-xl mx-auto mb-24" />
+        <div className="section-divider max-w-xl mx-auto mb-16" />
       </ScrollReveal>
 
       <div className="container mx-auto px-6">
