@@ -50,7 +50,7 @@ const SkillTagsSection = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06, duration: 0.4 }}
                 whileHover={{ scale: 1.05, y: -6 }}
-                className="neon-card px-4 py-4 text-center cursor-default"
+                className="neon-card !rounded-lg px-4 py-4 text-center cursor-default"
               >
                 <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                   {tag.label}
