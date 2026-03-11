@@ -101,6 +101,7 @@ const Index = () => {
       <div className="relative z-10">
         <Navbar />
         <HeroSection />
+        <SkillTagsSection />
         <ProfileSection />
         <AboutSection />
         <SkillsSection />
