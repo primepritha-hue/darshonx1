@@ -41,7 +41,7 @@ const Auth = () => {
         <div className="glass rounded-2xl p-8">
           <div className="flex items-center justify-center gap-2 mb-8">
             <Terminal className="w-6 h-6 text-primary" />
-            <span className="text-2xl font-bold gradient-text">Dev.folio</span>
+            <span className="text-2xl font-bold gradient-text">{brandName}</span>
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-2">
