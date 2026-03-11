@@ -136,19 +136,29 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.9 }}
           className="flex items-center justify-center gap-5 mb-16"
         >
-          {[
-            { icon: Github, href: settings?.github_url || "#" },
-            { icon: Linkedin, href: settings?.linkedin_url || "#" },
-            { icon: Mail, href: "#contact" },
-          ].map(({ icon: Icon, href }, i) => (
-            <a
-              key={i}
-              href={href}
-              className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group"
-            >
-              <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </a>
-          ))}
+          {socialLinks && socialLinks.length > 0 ? (
+            socialLinks.map((link) => {
+              const Icon = iconMap[link.icon] || Globe;
+              return (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group"
+                  title={link.name}
+                >
+                  <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </a>
+              );
+            })
+          ) : (
+            [{icon: Github, href: settings?.github_url || "#"}, {icon: Linkedin, href: settings?.linkedin_url || "#"}, {icon: Mail, href: "#contact"}].map(({icon: Icon, href}, i) => (
+              <a key={i} href={href} className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group">
+                <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </a>
+            ))
+          )}
         </motion.div>
 
         <motion.div
