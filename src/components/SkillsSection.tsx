@@ -34,9 +34,9 @@ const SkillsSection = () => {
   const { data: skills } = useSkills();
 
   return (
-    <section id="skills" className="relative py-32">
+    <section id="skills" className="relative py-16">
       <ScrollReveal scale blur>
-        <div className="section-divider max-w-xl mx-auto mb-32" />
+        <div className="section-divider max-w-xl mx-auto mb-16" />
       </ScrollReveal>
       <div className="container mx-auto px-6">
         <ScrollReveal scale blur>

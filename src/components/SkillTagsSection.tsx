@@ -30,7 +30,7 @@ const SkillTagsSection = () => {
   if (!tags || tags.length === 0) return null;
 
   return (
-    <section className="relative -mt-16 pb-16 z-10">
+    <section className="relative -mt-16 pb-4 z-10">
       <div className="container mx-auto px-6">
         <ScrollReveal scale blur>
           <div className="text-center mb-8">
