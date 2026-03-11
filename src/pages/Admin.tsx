@@ -44,6 +44,13 @@ type SocialLink = {
   is_active: boolean;
 };
 
+type SkillTag = {
+  id: string;
+  label: string;
+  sort_order: number;
+  is_active: boolean;
+};
+
 type Skill = {
   id: string;
   name: string;
