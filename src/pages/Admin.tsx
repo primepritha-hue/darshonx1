@@ -44,6 +44,13 @@ type SocialLink = {
   is_active: boolean;
 };
 
+type SkillTag = {
+  id: string;
+  label: string;
+  sort_order: number;
+  is_active: boolean;
+};
+
 type Skill = {
   id: string;
   name: string;
@@ -79,7 +86,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools" | "social">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "skills" | "projects" | "content" | "tools" | "social" | "skilltags">("settings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -89,6 +96,7 @@ const Admin = () => {
   const [uploadingToolId, setUploadingToolId] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+  const [skillTags, setSkillTags] = useState<SkillTag[]>([]);
 
   useEffect(() => {
     checkAuth();
@@ -119,12 +127,13 @@ const Admin = () => {
   };
 
   const loadData = async () => {
-    const [settingsRes, skillsRes, projectsRes, toolsRes, socialRes] = await Promise.all([
+    const [settingsRes, skillsRes, projectsRes, toolsRes, socialRes, skillTagsRes] = await Promise.all([
       supabase.from("site_settings").select("*").limit(1).single(),
       supabase.from("skills").select("*").order("sort_order"),
       supabase.from("projects").select("*").order("sort_order"),
       supabase.from("tools").select("*").order("sort_order"),
       supabase.from("social_links").select("*").order("sort_order"),
+      supabase.from("skill_tags" as any).select("*").order("sort_order"),
     ]);
 
     if (settingsRes.data) setSettings(settingsRes.data as unknown as SiteSettings);
@@ -132,6 +141,7 @@ const Admin = () => {
     if (projectsRes.data) setProjects(projectsRes.data as Project[]);
     if (toolsRes.data) setTools(toolsRes.data as unknown as Tool[]);
     if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[]);
+    if (skillTagsRes.data) setSkillTags(skillTagsRes.data as unknown as SkillTag[]);
   };
 
   const handleLogout = async () => {
@@ -362,7 +372,38 @@ const Admin = () => {
     else setSocialLinks(socialLinks.filter((l) => l.id !== id));
   };
 
-  if (loading) {
+  // ── Skill Tags CRUD ──
+  const addSkillTag = async () => {
+    const { data, error } = await supabase
+      .from("skill_tags" as any)
+      .insert({ label: "🆕 New Tag", sort_order: skillTags.length } as any)
+      .select()
+      .single();
+    if (error) toast.error(error.message);
+    else if (data) setSkillTags([...skillTags, data as unknown as SkillTag]);
+  };
+
+  const updateSkillTag = (id: string, updates: Partial<SkillTag>) => {
+    setSkillTags(skillTags.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  };
+
+  const saveSkillTag = async (tag: SkillTag) => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("skill_tags" as any)
+      .update({ label: tag.label, sort_order: tag.sort_order, is_active: tag.is_active } as any)
+      .eq("id", tag.id);
+    if (error) toast.error(error.message);
+    else toast.success("Tag saved!");
+    setSaving(false);
+  };
+
+  const deleteSkillTag = async (id: string) => {
+    const { error } = await supabase.from("skill_tags" as any).delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else setSkillTags(skillTags.filter((t) => t.id !== id));
+  };
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <StarField />
@@ -379,6 +420,7 @@ const Admin = () => {
   const tabs = [
     { key: "settings" as const, label: "Site Info", icon: Settings },
     { key: "content" as const, label: "Content", icon: Layout },
+    { key: "skilltags" as const, label: "Skill Tags", icon: User },
     { key: "skills" as const, label: "Skills", icon: Code2 },
     { key: "projects" as const, label: "Projects", icon: FolderOpen },
     { key: "tools" as const, label: "Tools", icon: Wrench },
@@ -934,6 +976,64 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Skill Tags Tab */}
+            {activeTab === "skilltags" && (
+              <div className="max-w-2xl space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-foreground">Skill Tags (Hero Section)</h3>
+                  <button
+                    onClick={addSkillTag}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Tag
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Hero section এর নিচে grid আকারে দেখাবে। Emoji সহ label লিখুন (যেমন: 🌐 ওয়েব ডেভেলপার)</p>
+                {skillTags.map((tag) => (
+                  <div key={tag.id} className="glass rounded-xl p-4 space-y-3">
+                    <div className="flex gap-3 items-center">
+                      <input
+                        value={tag.label}
+                        onChange={(e) => updateSkillTag(tag.id, { label: e.target.value })}
+                        placeholder="🌐 Skill Tag"
+                        className={`flex-1 ${inputSmClass}`}
+                      />
+                      <input
+                        type="number"
+                        value={tag.sort_order}
+                        onChange={(e) => updateSkillTag(tag.id, { sort_order: parseInt(e.target.value) || 0 })}
+                        className={`w-20 ${inputSmClass}`}
+                        placeholder="Order"
+                      />
+                      <button
+                        onClick={() => updateSkillTag(tag.id, { is_active: !tag.is_active })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          tag.is_active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {tag.is_active ? "Active" : "Hidden"}
+                      </button>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => saveSkillTag(tag)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                      >
+                        <Save className="w-3 h-3" /> Save
+                      </button>
+                      <button
+                        onClick={() => deleteSkillTag(tag.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" /> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </motion.div>
