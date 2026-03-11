@@ -14,6 +14,26 @@ const HeroSection = () => {
       <ParticleBurst />
 
       <div className="container mx-auto px-6 text-center relative z-10">
+        {/* Profile Image */}
+        {(settings as any)?.profile_image_url && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-8 flex justify-center"
+          >
+            <div className="relative group">
+              <div className="absolute -inset-1 rounded-full opacity-60 blur-md group-hover:opacity-100 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-pink)), hsl(var(--neon-gold)))" }} />
+              <img
+                src={(settings as any).profile_image_url}
+                alt={settings?.name || "Profile"}
+                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-2"
+                style={{ borderColor: "hsl(var(--primary) / 0.4)" }}
+              />
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
