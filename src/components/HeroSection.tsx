@@ -1,12 +1,52 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, Github, Linkedin, Mail } from "lucide-react";
+import { ChevronDown, Github, Linkedin, Mail, Globe, Music, Link as LinkIcon, Send } from "lucide-react";
+import { FaDiscord, FaTelegram, FaSpotify, FaThreads, FaInstagram, FaYoutube, FaTwitch, FaXTwitter, FaFacebook, FaReddit, FaSteam, FaTiktok } from "react-icons/fa6";
 import { useSiteSettings } from "@/hooks/usePortfolioData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import ParticleBurst from "./ParticleBurst";
 import TypingEffect from "./TypingEffect";
 
+const iconMap: Record<string, React.ElementType> = {
+  discord: FaDiscord,
+  telegram: FaTelegram,
+  spotify: FaSpotify,
+  threads: FaThreads,
+  github: Github,
+  instagram: FaInstagram,
+  youtube: FaYoutube,
+  twitch: FaTwitch,
+  x: FaXTwitter,
+  facebook: FaFacebook,
+  linkedin: Linkedin,
+  reddit: FaReddit,
+  steam: FaSteam,
+  tiktok: FaTiktok,
+  globe: Globe,
+  link: LinkIcon,
+  music: Music,
+  mail: Mail,
+  send: Send,
+};
+
+const useSocialLinks = () =>
+  useQuery({
+    queryKey: ["social_links"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+  });
+
 const HeroSection = () => {
   const { data: settings } = useSiteSettings();
+  const { data: socialLinks } = useSocialLinks();
   const [nameRevealed, setNameRevealed] = useState(false);
 
   return (
@@ -96,19 +136,29 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.9 }}
           className="flex items-center justify-center gap-5 mb-16"
         >
-          {[
-            { icon: Github, href: settings?.github_url || "#" },
-            { icon: Linkedin, href: settings?.linkedin_url || "#" },
-            { icon: Mail, href: "#contact" },
-          ].map(({ icon: Icon, href }, i) => (
-            <a
-              key={i}
-              href={href}
-              className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group"
-            >
-              <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </a>
-          ))}
+          {socialLinks && socialLinks.length > 0 ? (
+            socialLinks.map((link) => {
+              const Icon = iconMap[link.icon] || Globe;
+              return (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group"
+                  title={link.name}
+                >
+                  <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </a>
+              );
+            })
+          ) : (
+            [{icon: Github, href: settings?.github_url || "#"}, {icon: Linkedin, href: settings?.linkedin_url || "#"}, {icon: Mail, href: "#contact"}].map(({icon: Icon, href}, i) => (
+              <a key={i} href={href} className="w-12 h-12 rounded-2xl neon-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-500 group">
+                <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </a>
+            ))
+          )}
         </motion.div>
 
         <motion.div
