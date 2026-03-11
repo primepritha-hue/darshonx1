@@ -41,7 +41,7 @@ const SkillTagsSection = () => {
         </ScrollReveal>
 
         <ScrollReveal scale blur delay={0.15}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {tags.map((tag, i) => (
               <motion.div
                 key={tag.id}
@@ -49,10 +49,18 @@ const SkillTagsSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06, duration: 0.4 }}
-                whileHover={{ scale: 1.05, y: -6 }}
-                className="neon-card !rounded-lg px-4 py-4 text-center cursor-default"
+                whileHover={{
+                  scale: 1.05,
+                  y: -6,
+                  boxShadow: "0 0 20px hsl(var(--primary) / 0.15), 0 4px 24px hsl(var(--primary) / 0.1)",
+                }}
+                className="group relative overflow-hidden rounded-xl border border-border/30 backdrop-blur-md px-5 py-5 text-center cursor-default transition-all duration-300 hover:border-primary/40"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.3))",
+                }}
               >
-                <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: "radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.08), transparent 70%)" }} />
+                <span className="relative text-sm md:text-base font-semibold text-muted-foreground group-hover:text-foreground transition-colors duration-300">
                   {tag.label}
                 </span>
               </motion.div>
