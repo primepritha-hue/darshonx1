@@ -30,8 +30,23 @@ const iconMap: Record<string, React.ElementType> = {
   send: Send,
 };
 
+const useSocialLinks = () =>
+  useQuery({
+    queryKey: ["social_links"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+  });
+
 const HeroSection = () => {
   const { data: settings } = useSiteSettings();
+  const { data: socialLinks } = useSocialLinks();
   const [nameRevealed, setNameRevealed] = useState(false);
 
   return (
